@@ -12,10 +12,10 @@ BOOT_TYPE=''
 
 # Partitions (only in use if PARTITIONING is set to auto);
 # HOME (set 0 or leave blank to not create home partition).
-HOME_SIZE='10' #GB (recommend 10GB)
+HOME_SIZE='0' #GB (recommend 10GB)
 
 # VAR (set 0 or leave blank to not create var partition).
-VAR_SIZE='5' #GB (recommend 5GB)
+VAR_SIZE='0' #GB (recommend 5GB)
 
 # SWAP (set 0 or leave blank to not create swap partition).
 SWAP_SIZE='2' #GB (recommend square root of ram)
@@ -28,22 +28,22 @@ EFI_SIZE='512' #MB (recommend (or if not set) 512MB)
 LANG='en_US'
 
 # System timezone (leave blank to be prompted).
-TIMEZONE='America/New_York'
+TIMEZONE='Europe/Warsaw'
 
 # System hostname (leave blank to be prompted).
-HOSTNAME='host'
+HOSTNAME='Skynet'
 
 # Root password (leave blank to be prompted).
 ROOT_PASSWORD=''
 
 # Main user to create (by default, added to wheel group, and others).
-USER_NAME=''
+USER_NAME='eryk'
 
 # The main user's password (leave blank to be prompted).
 USER_PASSWORD=''
 
-KEYMAP='us'
-#KEYMAP='dvorak'
+# Keyboard layout
+KEYMAP='pl'
 
 # Choose your video driver
 # For Intel
@@ -80,54 +80,51 @@ HOSTS_FILE_TYPE="unified"
 install_packages() {
 
 	# General utilities/libraries
-	packages="pkgfile reflector htop python python-pip rfkill rsync sudo unrar unzip wget zip maim ffmpeg cronie zsh stow xdg-user-dirs libnotify tlp exa"
-	deamons="pkgfile-update.timer cronie tlp"
+	packages="reflector htop rfkill sudo unrar unzip wget zip xdg-user-dirs tlp exa fish"
+	deamons="tlp"
 
 	# Sounds
 	packages="$packages alsa-utils pulseaudio pulseaudio-alsa"
 
-	# Development packages
-	packages="$packages git cmake gdb qemu libvirt virt-manager iptables ebtables dnsmasq bridge-utils openbsd-netcat ovmf"
-	deamons="$deamons iptables libvirtd"
-
 	# Network
-	packages="$packages dhcpcd iwd"
-	deamons="$deamons dhcpcd iwd"
+	packages="$packages networkmanager"
+	
 
 	# Fonts
-	packages="$packages ttf-inconsolata ttf-dejavu ttf-font-awesome ttf-joypixels"
+	packages="$packages ttf-dejavu noto-fonts noto-fonts-emoji ttf-hack"
 
 	# Xorg
-	packages="$packages xorg-server xorg-xinit xorg-xsetroot xwallpaper xcape xclip slock unclutter arc-gtk-theme"
+	packages="$packages xorg"
+	
+	# KDE Plasma
+	packages="$packages plasma konsole dolphin gwenview okular ark archlinux-wallpaper sddm"
+	deamons="$deamons sddm"
+	delete="plasma-vault plasma-thunderbolt oxygen discover"
 
-	# WM
-	packages="$packages bspwm sxhkd picom dunst polybar xdo xdotool"
+	# bspwm
+	#packages="$packages bspwm sxhkd picom dunst polybar xdo xdotool"
 
 	# Browser
-	packages="$packages qutebrowser"
+	packages="$packages chromium"
 
 	# Terminal apps
-	packages="$packages alacritty ranger-git vifm tmux neomutt abook neovim"
+	packages="$packages micro-bin xclip neofetch bashtop gotop-bin onefetch-bin"
 
 	# Multimedia
-	packages="$packages mpv mpd mpc ncmpcpp"
+	packages="$packages vlc"
 
 	# Communicators
-	packages="$packages irssi telegram-desktop"
+	packages="$packages discord"
 
 	# For laptops
 	packages="$packages xf86-input-libinput"
 
 	# Office
-	packages="$packages libreoffice-still zathura zathura-pdf-mupdf sxiv"
+	#packages="$packages libreoffice-still"
 
 	# Bluetooth
 	packages="$packages bluez bluez-utils pulseaudio-bluetooth"
 	deamons="$deamons bluetooth"
-
-	# Printers
-	packages="$packages ghostscript gsfonts gutenprint foomatic-db-gutenprint-ppds cups libcups system-config-printer"
-	deamons="$deamons cups-browsed"
 
 	# Video drivers
 	if [ "$VIDEO_DRIVER" = "i915" ]; then
@@ -140,26 +137,23 @@ install_packages() {
 		packages="$packages xf86-video-vesa"
 	fi
 
-	# Python pip
-	pip_packages="ueberzug pynvim msgpack"
-
 	# Install
 	sudo -u $USER_NAME yay --needed --noconfirm -Syu $packages
-	sudo -u $USER_NAME pip3 install --user $pip_packages
-	pip3 install --upgrade msgpack
-
-	# Configure
-	sed -i 's/#AutoEnable=false/AutoEnable=true/g' /etc/bluetooth/main.conf
+	
+	# Delete 
+	[ "$delete" ] && {
+		sudo -u $USER_NAME yay --noconfirm -Rns $delete
+	}
+	
+	# Configure bluetooth
+	sed -i 's/#AutoEnable=false/AutoEnable=true/g' /etc//main.conf
 	rfkill unblock bluetooth
 
 	# Demons
 	systemctl enable $deamons
 
-	# Groups
-	usermod -a -G kvm,libvirt $USER_NAME
-
-	# Shell
-	chsh $USER_NAME -s /usr/bin/zsh
+	# Set default user shell
+	chsh $USER_NAME -s /usr/bin/fish
 }
 
 #=======
@@ -169,9 +163,9 @@ greeter() {
 	cat <<EOF
 
        /\\
-      /  \\
-     /\\   \\      Script written by Cherrry9
-    /  ..  \\     https://github.com/Cherrry9
+      /  \\       Arch Linux install script
+     /\\   \\      Written by Cherrry9 (https://github.com/Cherrry9)
+    /  ..  \\     Forked by Smuger12 (https://github.com/Smuger12)
    /  '  '  \\
   / ..'  '.. \\
  /_\`        \`_\\
@@ -421,8 +415,7 @@ set_mirrorlist() {
 }
 
 install_base() {
-	pacstrap /mnt base linux linux-firmware base-devel
-	pacstrap /mnt git grub
+	pacstrap /mnt base linux-zen linux-firmware base-devel git grub
 	genfstab -U /mnt >/mnt/etc/fstab
 }
 
@@ -483,8 +476,6 @@ set_keymap() {
 	keymap="$1"
 	cat >/etc/vconsole.conf <<EOF
 KEYMAP=$keymap
-FONT=Lat2-Terminus16.psfu.gz
-FONT_MAP=8859-2
 EOF
 }
 
@@ -492,7 +483,6 @@ set_timezone() {
 	timezone="$1"
 	ln -sf /usr/share/zoneinfo/"$timezone" /etc/localtime
 	hwclock --systohc
-
 }
 
 set_root_password() {
@@ -538,7 +528,7 @@ set_boot() {
 	boot_type="$1"
 	if [ "$boot_type" = 'efi' ]; then
 		pacman -Sy --noconfirm efibootmgr
-		grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+		grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --removable
 	else
 		grub-install --target=i386-pc "$DRIVE"
 	fi
@@ -546,7 +536,7 @@ set_boot() {
 }
 
 install_yay() {
-	git clone https://aur.archlinux.org/yay.git /yay
+	git clone https://aur.archlinux.org/yay-bin.git /yay
 	cd /yay
 	chown $USER_NAME:$USER_NAME /yay
 	sudo -u $USER_NAME makepkg -si --noconfirm
@@ -554,16 +544,12 @@ install_yay() {
 	rm -r /yay
 }
 
-update_pkgfile() {
-	pkgfile -u
-}
-
 disable_pc_speaker() {
 	echo "blacklist pcspkr" >>/etc/modprobe.d/nobeep.conf
 }
 
 clean_packages() {
-	yes | pacman -Scc
+	yes | yay -Scc
 }
 
 set_pacman() {
@@ -629,8 +615,7 @@ EOF
 }
 
 set_makepkg() {
-	numberofcores
-	numberofcores=$(grep -c ^processor /proc/cpuinfo)
+	numberofcores=$(nproc)
 	sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$((numberofcores + 1))\"/g" /etc/makepkg.conf
 	sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $numberofcores -z -)/g" /etc/makepkg.conf
 }
@@ -735,14 +720,11 @@ configure() {
 	echo 'Installing yay'
 	install_yay
 
-	echo 'Installing additional packages'
+	echo 'Installing and configuring additional packages'
 	install_packages
 
 	echo 'Clearing package tarballs'
 	clean_packages
-
-	echo 'Updating pkgfile database'
-	update_pkgfile
 
 	echo 'Disabling PC speaker'
 	disable_pc_speaker
