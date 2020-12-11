@@ -3,7 +3,7 @@ install arch on efi/legacy with grub and additional partitions such as var, swap
 # how it work
 clone script
 
-`git clone https://github.com/Cherrry9/arch_install`
+`git clone https://github.com/Smuger12/arch_install`
 
 customize the variables at the beginning of the script
 
