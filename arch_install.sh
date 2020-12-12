@@ -88,11 +88,11 @@ install_packages() {
 
 	# Network
 	packages="$packages networkmanager"
-	
+	deamons="$deamons NetworkManager"
 
 	# Fonts
 	packages="$packages ttf-dejavu noto-fonts noto-fonts-emoji ttf-hack"
-
+	
 	# Xorg
 	packages="$packages xorg"
 	
