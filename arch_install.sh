@@ -45,6 +45,13 @@ USER_PASSWORD=''
 # Keyboard layout
 KEYMAP='pl'
 
+# CPU microcode
+UCODE='intel-ucode'
+#UCODE='amd-ucode'
+
+# Linux kernel
+KERNEL='linux-zen'
+
 # Choose your video driver
 # For Intel
 VIDEO_DRIVER="i915"
@@ -163,7 +170,7 @@ greeter() {
 	cat <<EOF
 
        /\\
-      /  \\       Arch Linux install script
+      /  \\       Arch Linux install script for the lazy
      /\\   \\      Written by Cherrry9 (https://github.com/Cherrry9)
     /  ..  \\     Forked by Smuger12 (https://github.com/Smuger12)
    /  '  '  \\
@@ -415,7 +422,7 @@ set_mirrorlist() {
 }
 
 install_base() {
-	pacstrap /mnt base linux-zen linux-firmware base-devel git grub
+	pacstrap /mnt base base-devel $KERNEL $UCODE linux-firmware git grub
 	genfstab -U /mnt >/mnt/etc/fstab
 }
 
