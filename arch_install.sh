@@ -156,7 +156,7 @@ install_packages() {
 
 	# Set default user shell
 	chsh $USER_NAME -s /usr/bin/fish
-	fish && set -x fish_greeting && bash # disable fish greeting
+	fish -c "set -x fish_greeting" # disable fish greeting
 }
 
 #=======
