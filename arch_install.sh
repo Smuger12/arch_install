@@ -54,13 +54,16 @@ KERNEL='linux-zen'
 
 # Choose your video driver
 # For Intel
-VIDEO_DRIVER="i915"
+#VIDEO_DRIVER="i915"
+
 # For nVidia
 #VIDEO_DRIVER="nouveau"
+
 # For ATI
 #VIDEO_DRIVER="radeon"
+
 # For generic stuff
-#VIDEO_DRIVER="vesa"
+VIDEO_DRIVER="vesa"
 
 # Choose hosts file type or leave blank
 # Credit to https://github.com/StevenBlack/hosts
@@ -88,7 +91,7 @@ install_packages() {
 
 	# General utilities/libraries
 	packages="reflector htop rfkill sudo unrar unzip wget zip xdg-user-dirs tlp exa fish"
-	deamons="tlp"
+	#deamons="tlp"
 
 	# Sounds
 	packages="$packages alsa-utils pulseaudio pulseaudio-alsa"
@@ -99,18 +102,12 @@ install_packages() {
 
 	# Fonts
 	packages="$packages ttf-dejavu noto-fonts noto-fonts-emoji ttf-hack"
-	
-	# Xorg
-	packages="$packages xorg"
-	
+
 	# KDE Plasma
 	packages="$packages plasma konsole dolphin gwenview okular ark archlinux-wallpaper sddm"
 	deamons="$deamons sddm"
 	delete="plasma-vault plasma-thunderbolt oxygen discover"
-
-	# bspwm
-	#packages="$packages bspwm sxhkd picom dunst polybar xdo xdotool"
-
+	
 	# Browser
 	packages="$packages chromium"
 
@@ -125,9 +122,6 @@ install_packages() {
 
 	# For laptops
 	packages="$packages xf86-input-libinput"
-
-	# Office
-	#packages="$packages libreoffice-still"
 
 	# Bluetooth
 	packages="$packages bluez bluez-utils pulseaudio-bluetooth"
@@ -145,15 +139,16 @@ install_packages() {
 	fi
 
 	# Install
-	sudo -u $USER_NAME yay --needed --noconfirm -Syu $packages
+	sudo -u $USER_NAME pacman --needed --noconfirm -Syu $packages
+	yay --needed --noconfirm -Syu $packages
 	
 	# Delete 
 	[ "$delete" ] && {
-		sudo -u $USER_NAME yay --noconfirm -Rns $delete
+		yay --noconfirm -Rns $delete
 	}
 	
 	# Configure bluetooth
-	sed -i 's/#AutoEnable=false/AutoEnable=true/g' /etc//main.conf
+	sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
 	rfkill unblock bluetooth
 
 	# Demons
@@ -161,6 +156,7 @@ install_packages() {
 
 	# Set default user shell
 	chsh $USER_NAME -s /usr/bin/fish
+	fish && set -x fish_greeting && bash # disable fish greeting
 }
 
 #=======
