@@ -50,13 +50,13 @@ UCODE='intel-ucode'
 #UCODE='amd-ucode'
 
 # Linux kernel
-KERNEL='linux-zen'
+KERNEL='linux-zen linux-lts'
 
 # Choose your video driver
 # For Intel
 #VIDEO_DRIVER="i915"
 
-# For nVidia
+# For (f*cking) nVidia 
 #VIDEO_DRIVER="nouveau"
 
 # For ATI
@@ -65,7 +65,7 @@ KERNEL='linux-zen'
 # For generic stuff
 VIDEO_DRIVER="vesa"
 
-# Choose hosts file type or leave blank
+# Choose hosts file type or leave blank for "default" hosts
 # Credit to https://github.com/StevenBlack/hosts
 # Hosts file type:
 # unified (adware + malware)
@@ -89,11 +89,11 @@ HOSTS_FILE_TYPE="unified"
 # Customize to install other packages
 install_packages() {
 
-	# General utilities/libraries
+	# General utilities
 	packages="reflector htop rfkill sudo unrar unzip wget zip xdg-user-dirs tlp exa fish"
 	services="tlp"
 
-	# Sounds
+	# Sound
 	packages="$packages alsa-utils pulseaudio pulseaudio-alsa"
 
 	# Network
@@ -183,8 +183,9 @@ EOF
 }
 
 network() {
-	ping -c 1 archlinux.org >/dev/null || wifi-menu || {
-		echo "Can't connect to the internet!"
+	ping -c 3 archlinux.org >/dev/null || {
+		echo "Can't connect to the Internet!"
+		echo 'If you use Wi-Fi use "iwctl" to connect to the Internet.'
 		exit 1
 	}
 	timedatectl set-ntp true
@@ -630,9 +631,9 @@ setup() {
 	network
 
 	if [ -e "$DRIVE" ]; then
-		printf "%s :: Are you sure? This disk will be formatted: [y/n] " "$DRIVE"
+		printf "%s :: Are you sure? This disk will be formatted: [Y/n] " "$DRIVE"
 		read -r choice
-		[ ! "$choice" = "y" ] && exit
+		[ ! "$choice" = "Y" ] && exit
 	else
 		echo "$DRIVE :: Device doesn't exist!"
 		exit 1
