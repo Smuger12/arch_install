@@ -1,5 +1,5 @@
 # Simple Arch Linux installation script in POSIX shell
-Install Arch Linux on EFI/Legacy with Grub and additional partitions such as var, swap, home also supports manual and automatic partitioning method.
+Install Arch Linux (with KDE Plasma) on EFI/Legacy with Grub and additional partitions such as var, swap, home also supports manual and automatic partitioning method.
 
 ## How to...
 
