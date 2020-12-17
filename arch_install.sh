@@ -168,8 +168,7 @@ EOF
 	echo "Instaling custom Grub theme"
 	git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
 	chown $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
-	cd /home/$USER_NAME/grub-themes
-	sudo -u $USER_NAME ./install.sh --boot --vimix --2k 
+	sudo -u $USER_NAME /home/$USER_NAME/grub-themes/install.sh --boot --vimix --2k 
 	cd /
 }
 
