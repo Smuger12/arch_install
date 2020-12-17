@@ -91,21 +91,21 @@ install_packages() {
 
 	# General utilities/libraries
 	packages="reflector htop rfkill sudo unrar unzip wget zip xdg-user-dirs tlp exa fish"
-	#deamons="tlp"
+	services="tlp"
 
 	# Sounds
 	packages="$packages alsa-utils pulseaudio pulseaudio-alsa"
 
 	# Network
 	packages="$packages networkmanager"
-	deamons="$deamons NetworkManager"
+	services="$services NetworkManager"
 
 	# Fonts
 	packages="$packages ttf-dejavu noto-fonts noto-fonts-emoji ttf-hack"
 
 	# KDE Plasma
 	packages="$packages plasma konsole dolphin gwenview okular ark archlinux-wallpaper sddm"
-	deamons="$deamons sddm"
+	services="$services sddm"
 	delete="plasma-vault plasma-thunderbolt oxygen discover"
 	
 	# Browser
@@ -125,7 +125,7 @@ install_packages() {
 
 	# Bluetooth
 	packages="$packages bluez bluez-utils pulseaudio-bluetooth"
-	deamons="$deamons bluetooth"
+	services="$services bluetooth"
 
 	# Video drivers
 	if [ "$VIDEO_DRIVER" = "i915" ]; then
@@ -144,19 +144,25 @@ install_packages() {
 	
 	# Delete 
 	[ "$delete" ] && {
-		yay --noconfirm -Rns $delete
+		sudo -u $USER_NAME pacman --noconfirm --quiet -Rns $delete
 	}
 	
 	# Configure bluetooth
 	sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
-	rfkill unblock bluetooth
 
-	# Demons
-	systemctl enable $deamons
+	# Enable systemd services
+	systemctl enable $services
 
-	# Set default user shell
+	# Configure fish
 	chsh $USER_NAME -s /usr/bin/fish
 	fish -c "set -x fish_greeting" # disable fish greeting
+	fish -c "set -x EDITOR micro" # default terminal text editor
+	
+	# Disable this f*cking kwallet
+	cat >/home/$USER_NAME/.config/kwalletrc <<EOF
+[Wallet]
+Enabled=false
+EOF
 }
 
 #=======
@@ -264,34 +270,34 @@ auto_partition() {
 
 	# efi
 	[ "$BOOT_TYPE" = 'efi' ] && {
-		parted -s "$DRIVE" select "$DRIVE" mkpart primary fat32 1MiB "${efi_end}MiB"
+		parted -s "$DRIVE" select "$DRIVE" mkpart primary "EFI" fat32 1MiB "${efi_end}MiB"
 		efi="${DRIVE}$next_part"
 		next_part=$((next_part + 1))
 	}
 
 	# swap
 	[ "$swap" ] && {
-		parted -s "$DRIVE" select "$DRIVE" mkpart primary linux-swap "${efi_end}MiB" "${swap_end}MiB"
+		parted -s "$DRIVE" select "$DRIVE" mkpart primary "SWAP" linux-swap "${efi_end}MiB" "${swap_end}MiB"
 		swap="${DRIVE}$next_part"
 		next_part=$((next_part + 1))
 	}
 
 	# home
 	[ "$home" ] && {
-		parted -s "$DRIVE" select "$DRIVE" mkpart primary ext4 "${swap_end}MiB" "${home_end}MiB"
+		parted -s "$DRIVE" select "$DRIVE" mkpart primary "HOME" ext4 "${swap_end}MiB" "${home_end}MiB"
 		home="${DRIVE}$next_part"
 		next_part=$((next_part + 1))
 	}
 
 	# var
 	[ "$var" ] && {
-		parted -s "$DRIVE" select "$DRIVE" mkpart primary ext4 "${home_end}MiB" "${var_end}MiB"
+		parted -s "$DRIVE" select "$DRIVE" mkpart primary "VAR" ext4 "${home_end}MiB" "${var_end}MiB"
 		var="${DRIVE}$next_part"
 		next_part=$((next_part + 1))
 	}
 
 	# root
-	parted -s "$DRIVE" select "$DRIVE" mkpart primary ext4 "${var_end}MiB" 100%
+	parted -s "$DRIVE" select "$DRIVE" mkpart primary "ROOT" ext4 "${var_end}MiB" 100%
 	root="${DRIVE}$next_part"
 }
 
@@ -414,7 +420,7 @@ EOF
 
 set_mirrorlist() {
 	pacman --noconfirm -Sy reflector
-	reflector --verbose --latest 200 --age 24 --sort rate --save /etc/pacman.d/mirrorlist
+	reflector --latest 200 --age 24 --sort rate --save /etc/pacman.d/mirrorlist
 }
 
 install_base() {
@@ -511,14 +517,9 @@ set_sudoers() {
 
 Defaults env_reset
 Defaults pwfeedback
-Defaults lecture="always"
+Defaults lecture="once"
 Defaults lecture_file="/home/$USER_NAME/.local/share/sudoers.bee"
-
-# Host alias specification
-
-# User alias specification
-
-# Cmnd alias specification
+Defaults badpass_message="Password is wrong, please try again"
 
 # User privilege specification
 root   ALL=(ALL) ALL
@@ -618,9 +619,8 @@ EOF
 }
 
 set_makepkg() {
-	numberofcores=$(nproc)
-	sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$((numberofcores + 1))\"/g" /etc/makepkg.conf
-	sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $numberofcores -z -)/g" /etc/makepkg.conf
+	sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$(nproc)\"/g" /etc/makepkg.conf
+	sed -i "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $(nproc) -z -)/g" /etc/makepkg.conf
 }
 
 setup() {
@@ -726,7 +726,7 @@ configure() {
 	echo 'Installing and configuring additional packages'
 	install_packages
 
-	echo 'Clearing package tarballs'
+	echo 'Clearing yay/pacman cache'
 	clean_packages
 
 	echo 'Disabling PC speaker'
