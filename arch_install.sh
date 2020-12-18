@@ -152,8 +152,6 @@ install_packages() {
 
 	# Configure fish
 	chsh $USER_NAME -s /usr/bin/fish
-	sudo -u $USER_NAME fish -c "set -x fish_greeting" # disable fish greeting
-	sudo -u $USER_NAME fish -c "set -x EDITOR micro" # default terminal text editor
 	
 	# Install Grub theme (https://github.com/vinceliuice/grub2-themes)
 	echo "Instaling custom Grub theme"
