@@ -104,7 +104,7 @@ install_packages() {
 	packages="$packages ttf-dejavu noto-fonts noto-fonts-emoji ttf-hack"
 
 	# KDE Plasma
-	packages="$packages plasma konsole dolphin gwenview okular ark archlinux-wallpaper sddm"
+	packages="$packages xorg plasma konsole dolphin gwenview okular ark archlinux-wallpaper sddm kwalletmanager"
 	services="$services sddm"
 	delete="plasma-vault plasma-thunderbolt oxygen discover"
 	
@@ -142,9 +142,7 @@ install_packages() {
 	sudo -u $USER_NAME yay --needed --noconfirm -Syu $packages
 	
 	# Delete 
-	[ "$delete" ] && {
-		sudo -u $USER_NAME pacman --noconfirm -Rns $delete
-	}
+	sudo -u $USER_NAME yay --noconfirm -Rns $delete
 	
 	# Configure bluetooth
 	sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
@@ -154,20 +152,13 @@ install_packages() {
 
 	# Configure fish
 	chsh $USER_NAME -s /usr/bin/fish
-	fish -c "set -x fish_greeting" # disable fish greeting
-	fish -c "set -x EDITOR micro" # default terminal text editor
-	
-	# Disable this f*cking kwallet
-	mkdir /home/$USER_NAME/.config && touch /home/$USER_NAME/.config/kwalletrc
-	cat >/home/$USER_NAME/.config/kwalletrc <<EOF
-[Wallet]
-Enabled=false
-EOF
+	sudo -u $USER_NAME fish -c "set -x fish_greeting" # disable fish greeting
+	sudo -u $USER_NAME fish -c "set -x EDITOR micro" # default terminal text editor
 	
 	# Install Grub theme (https://github.com/vinceliuice/grub2-themes)
 	echo "Instaling custom Grub theme"
 	git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
-	/home/$USER_NAME/grub-themes/install.sh --boot --tela --2k
+	/home/$USER_NAME/grub-themes/install.sh --boot --vimix --2k --white
 }
 
 #=======
@@ -207,7 +198,7 @@ detect_boot_type() {
 format_and_mount() {
 	# format && mount
 	mkdir -p /mnt
-	yes | mkfs.ext4 "$root"
+	yes | mkfs.ext4 -L ROOT "$root"
 	mount "$root" /mnt
 
 	[ "$efi" ] && {
