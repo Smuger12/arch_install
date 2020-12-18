@@ -40,7 +40,7 @@ ROOT_PASSWORD=''
 USER_NAME='eryk'
 
 # The main user's password (leave blank to be prompted).
-USER_PASSWORD='$ROOT_PASSWORD'
+USER_PASSWORD=$ROOT_PASSWORD
 
 # Keyboard layout
 KEYMAP='pl'
