@@ -159,6 +159,7 @@ install_packages() {
 	fish -c "set -x EDITOR micro" # default terminal text editor
 	
 	# Disable this f*cking kwallet
+	touch /home/$USER_NAME/.config/kwalletrc
 	cat >/home/$USER_NAME/.config/kwalletrc <<EOF
 [Wallet]
 Enabled=false
@@ -167,9 +168,7 @@ EOF
 	# Install Grub theme (https://github.com/vinceliuice/grub2-themes)
 	echo "Instaling custom Grub theme"
 	git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
-	chown $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
-	sudo -u $USER_NAME /home/$USER_NAME/grub-themes/install.sh --boot --vimix --2k 
-	cd /
+	/home/$USER_NAME/grub-themes/install.sh --boot --vimix --2k 
 }
 
 #=======
@@ -527,7 +526,6 @@ Defaults env_reset
 Defaults pwfeedback
 Defaults lecture="once"
 Defaults lecture_file="/home/$USER_NAME/.local/share/sudoers.bee"
-Defaults badpass_message="Password is wrong, please try again"
 
 # User privilege specification
 root   ALL=(ALL) ALL
@@ -550,9 +548,8 @@ set_boot() {
 install_yay() {
 	git clone https://aur.archlinux.org/yay-bin.git /yay
 	cd /yay
-	chown $USER_NAME:$USER_NAME /yay
-	sudo -u $USER_NAME makepkg -si --noconfirm
-	cd ..
+	makepkg -si --noconfirm
+	cd /
 	rm -r /yay
 }
 
