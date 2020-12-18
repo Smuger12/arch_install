@@ -168,7 +168,7 @@ EOF
 	# Install Grub theme (https://github.com/vinceliuice/grub2-themes)
 	echo "Instaling custom Grub theme"
 	git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
-	/home/$USER_NAME/grub-themes/install.sh --boot --vimix --2k 
+	/home/$USER_NAME/grub-themes/install.sh --boot --tela --2k
 }
 
 #=======
@@ -191,9 +191,8 @@ EOF
 }
 
 network() {
-	ping -c 3 archlinux.org >/dev/null || {
+	ping -c 1 archlinux.org >/dev/null || {
 		echo "Can't connect to the Internet!"
-		echo 'If you use Wi-Fi use "iwctl" to connect to the Internet.'
 		exit 1
 	}
 	timedatectl set-ntp true
@@ -540,7 +539,7 @@ set_boot() {
 	boot_type="$1"
 	if [ "$boot_type" = 'efi' ]; then
 		pacman -Sy --noconfirm efibootmgr
-		grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --removable
+		grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=ARCH --removable
 	else
 		grub-install --target=i386-pc "$DRIVE"
 	fi
