@@ -213,24 +213,24 @@ format_and_mount() {
 
 	[ "$efi" ] && {
 		mkdir -p /mnt/boot/efi
-		mkfs.fat -F32 "$efi"
+		mkfs.fat -F32 -n EFI "$efi"
 		mount "$efi" /mnt/boot/efi
 	}
 
 	[ "$swap" ] && {
-		mkswap "$swap"
+		mkswap -L SWAP "$swap"
 		swapon "$swap"
 	}
 
 	[ "$home" ] && {
 		mkdir -p /mnt/home
-		yes | mkfs.ext4 "$home"
+		yes | mkfs.ext4 -L HOME "$home"
 		mount "$home" /mnt/home
 	}
 
 	[ "$var" ] && {
 		mkdir -p /mnt/var
-		yes | mkfs.ext4 "$var"
+		yes | mkfs.ext4 -L VAR "$var"
 		mount "$var" /mnt/var
 	}
 }
@@ -278,34 +278,34 @@ auto_partition() {
 
 	# efi
 	[ "$BOOT_TYPE" = 'efi' ] && {
-		parted -s "$DRIVE" select "$DRIVE" mkpart primary "EFI" fat32 1MiB "${efi_end}MiB"
+		parted -s "$DRIVE" select "$DRIVE" mkpart primary fat32 1MiB "${efi_end}MiB"
 		efi="${DRIVE}$next_part"
 		next_part=$((next_part + 1))
 	}
 
 	# swap
 	[ "$swap" ] && {
-		parted -s "$DRIVE" select "$DRIVE" mkpart primary "SWAP" linux-swap "${efi_end}MiB" "${swap_end}MiB"
+		parted -s "$DRIVE" select "$DRIVE" mkpart primary linux-swap "${efi_end}MiB" "${swap_end}MiB"
 		swap="${DRIVE}$next_part"
 		next_part=$((next_part + 1))
 	}
 
 	# home
 	[ "$home" ] && {
-		parted -s "$DRIVE" select "$DRIVE" mkpart primary "HOME" ext4 "${swap_end}MiB" "${home_end}MiB"
+		parted -s "$DRIVE" select "$DRIVE" mkpart primary ext4 "${swap_end}MiB" "${home_end}MiB"
 		home="${DRIVE}$next_part"
 		next_part=$((next_part + 1))
 	}
 
 	# var
 	[ "$var" ] && {
-		parted -s "$DRIVE" select "$DRIVE" mkpart primary "VAR" ext4 "${home_end}MiB" "${var_end}MiB"
+		parted -s "$DRIVE" select "$DRIVE" mkpart primary ext4 "${home_end}MiB" "${var_end}MiB"
 		var="${DRIVE}$next_part"
 		next_part=$((next_part + 1))
 	}
 
 	# root
-	parted -s "$DRIVE" select "$DRIVE" mkpart primary "ROOT" ext4 "${var_end}MiB" 100%
+	parted -s "$DRIVE" select "$DRIVE" mkpart primary ext4 "${var_end}MiB" 100%
 	root="${DRIVE}$next_part"
 }
 
