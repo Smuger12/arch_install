@@ -18,7 +18,7 @@ HOME_SIZE='0' #GB (recommend 10GB)
 VAR_SIZE='0' #GB (recommend 5GB)
 
 # SWAP (set 0 or leave blank to not create swap partition).
-SWAP_SIZE='2' #GB (recommend square root of ram)
+SWAP_SIZE='0' #GB (recommend square root of ram)
 
 # EFI (set 0 or leave blank to not create efi partition).
 # is used if the system is to be installed on "uefi"
@@ -40,7 +40,7 @@ ROOT_PASSWORD=''
 USER_NAME='eryk'
 
 # The main user's password (leave blank to be prompted).
-USER_PASSWORD=''
+USER_PASSWORD='$ROOT_PASSWORD'
 
 # Keyboard layout
 KEYMAP='pl'
@@ -175,6 +175,8 @@ EOF
 # SETUP
 #=======
 greeter() {
+	
+	clear
 	cat <<EOF
 
        /\\
@@ -548,9 +550,10 @@ set_boot() {
 install_yay() {
 	git clone https://aur.archlinux.org/yay-bin.git /yay
 	cd /yay
-	makepkg -si --noconfirm
+	chown $USER_NAME:$USER_NAME /yay
+	sudo -u $USER_NAME makepkg -si --noconfirm
 	cd /
-	rm -r /yay
+	rm -rf /yay
 }
 
 disable_pc_speaker() {
