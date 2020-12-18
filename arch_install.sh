@@ -139,12 +139,11 @@ install_packages() {
 	fi
 
 	# Install
-	sudo -u $USER_NAME pacman --needed --noconfirm -Syu $packages
-	yay --needed --noconfirm -Syu $packages
+	sudo -u $USER_NAME yay --needed --noconfirm -Syu $packages
 	
 	# Delete 
 	[ "$delete" ] && {
-		sudo -u $USER_NAME pacman --noconfirm --quiet -Rns $delete
+		sudo -u $USER_NAME pacman --noconfirm -Rns $delete
 	}
 	
 	# Configure bluetooth
@@ -159,7 +158,7 @@ install_packages() {
 	fish -c "set -x EDITOR micro" # default terminal text editor
 	
 	# Disable this f*cking kwallet
-	touch /home/$USER_NAME/.config/kwalletrc
+	mkdir /home/$USER_NAME/.config && touch /home/$USER_NAME/.config/kwalletrc
 	cat >/home/$USER_NAME/.config/kwalletrc <<EOF
 [Wallet]
 Enabled=false
@@ -531,7 +530,7 @@ Defaults lecture_file="/home/$USER_NAME/.local/share/sudoers.bee"
 # User privilege specification
 root   ALL=(ALL) ALL
 %wheel ALL=(ALL) ALL
-%wheel ALL=(ALL) NOPASSWD: /bin/makepkg , /bin/pacman
+%wheel ALL=(ALL) NOPASSWD: /bin/makepkg , /bin/pacman , /bin/yay
 EOF
 }
 
