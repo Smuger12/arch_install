@@ -91,7 +91,7 @@ install_packages() {
 
 	# General utilities
 	packages="reflector htop rfkill sudo unrar unzip wget zip xdg-user-dirs tlp exa fish git"
-	services="tlp"
+	#services="tlp"
 
 	# Sound
 	packages="$packages alsa-utils pulseaudio pulseaudio-alsa"
@@ -125,7 +125,7 @@ install_packages() {
 
 	# Bluetooth
 	packages="$packages bluez bluez-utils pulseaudio-bluetooth"
-	services="$services bluetooth"
+	#services="$services bluetooth"
 
 	# Video drivers
 	if [ "$VIDEO_DRIVER" = "i915" ]; then
@@ -156,6 +156,7 @@ install_packages() {
 	# Install Grub theme (https://github.com/vinceliuice/grub2-themes)
 	echo "Instaling custom Grub theme"
 	git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
+	sudo -u $USER_NAME chown $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
 	/home/$USER_NAME/grub-themes/install.sh --boot --vimix --2k --white
 }
 
