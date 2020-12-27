@@ -514,13 +514,14 @@ set_sudoers() {
 
 Defaults env_reset
 Defaults pwfeedback
+Defaults passwd_timeout=0
 Defaults lecture="once"
 Defaults lecture_file="/home/$USER_NAME/.local/share/sudoers.bee"
 
 # User privilege specification
 root   ALL=(ALL) ALL
 %wheel ALL=(ALL) ALL
-%wheel ALL=(ALL) NOPASSWD: /bin/makepkg , /bin/pacman , /bin/yay
+%wheel ALL=(ALL) NOPASSWD: /bin/makepkg,/bin/pacman,/bin/yay
 EOF
 }
 
