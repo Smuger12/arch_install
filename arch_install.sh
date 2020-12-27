@@ -516,7 +516,6 @@ Defaults env_reset
 Defaults pwfeedback
 Defaults passwd_timeout=0
 Defaults lecture="once"
-Defaults lecture_file="/home/$USER_NAME/.local/share/sudoers.bee"
 
 # User privilege specification
 root   ALL=(ALL) ALL
@@ -627,9 +626,9 @@ setup() {
 	network
 
 	if [ -e "$DRIVE" ]; then
-		printf "%s :: Are you sure? This disk will be formatted: [Y/n] " "$DRIVE"
+		printf "%s :: Are you sure? This disk will be formatted: [YES/no] " "$DRIVE"
 		read -r choice
-		[ ! "$choice" = "Y" ] && exit
+		[ ! "$choice" = "YES" ] && exit
 	else
 		echo "$DRIVE :: Device doesn't exist!"
 		exit 1
