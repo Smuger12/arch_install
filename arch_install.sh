@@ -42,10 +42,14 @@ USER_NAME='eryk'
 # The main user's password (leave blank to be prompted).
 USER_PASSWORD=$ROOT_PASSWORD
 
-# Keyboard layout
+# Choose DE
+DE=kde
+#DE=gnome
+
+# Choose keyboard layout
 KEYMAP='pl'
 
-# CPU microcode
+# Choose CPU microcode
 UCODE='intel-ucode'
 #UCODE='amd-ucode'
 
@@ -56,7 +60,7 @@ KERNEL='linux-zen linux-lts'
 # For Intel
 #VIDEO_DRIVER="i915"
 
-# For (f*cking) nVidia 
+# For (f*cking) Nvidia 
 #VIDEO_DRIVER="nouveau"
 
 # For ATI
@@ -84,7 +88,7 @@ VIDEO_DRIVER="vesa"
 # fakenews-porn-social
 # gambling-porn-social
 # fakenews-gambling-porn-social
-HOSTS_FILE_TYPE="unified"
+HOSTS_FILE_TYPE=""
 
 # Customize to install other packages
 install_packages() {
@@ -102,17 +106,15 @@ install_packages() {
 
 	# Fonts
 	packages="$packages ttf-dejavu noto-fonts noto-fonts-emoji ttf-hack"
-
-	# KDE Plasma
-	packages="$packages xorg plasma konsole dolphin gwenview okular ark archlinux-wallpaper sddm kwalletmanager"
-	services="$services sddm"
-	delete="plasma-vault plasma-thunderbolt oxygen discover"
+	
+	# Pamac
+	#packages="$packages pamac-aur pamac-cli"
 	
 	# Browser
-	packages="$packages chromium"
+	packages="$packages firefox"
 
 	# Terminal apps
-	packages="$packages micro-bin xclip neofetch bashtop gotop-bin onefetch-bin"
+	packages="$packages micro-bin xclip neofetch"
 
 	# Multimedia
 	packages="$packages vlc"
@@ -125,7 +127,7 @@ install_packages() {
 
 	# Bluetooth
 	packages="$packages bluez bluez-utils pulseaudio-bluetooth"
-	#services="$services bluetooth"
+	services="$services bluetooth"
 
 	# Video drivers
 	if [ "$VIDEO_DRIVER" = "i915" ]; then
@@ -137,12 +139,21 @@ install_packages() {
 	elif [ "$VIDEO_DRIVER" = "vesa" ]; then
 		packages="$packages xf86-video-vesa"
 	fi
+	
+	if [ "$DE" = "kde" ]; then
+		packages="$packages xorg plasma konsole dolphin gwenview okular ark archlinux-wallpaper sddm kwalletmanager"
+		services="$services sddm"
+		delete="plasma-vault plasma-thunderbolt oxygen discover"
+	elif [ "$DE" = "gnome" ]; then
+		packages="$packages xorg gnome mutter-x11-scaling gnome-tweaks archlinux-wallpaper gnome-usage materia-gtk-theme papirus-icon-theme"
+		delete="epiphany gnome-books gnome-boxes gnome-calendar gnome-clocks gnome-software gnome-characters gnome-getting-started-docs gnome-font-viewer gnome-documents yelp simple-scan gnome-wheather gnome-user-docs gnome-contacts"
+		services="$services gdm"
+	fi
 
 	# Install
 	sudo -u $USER_NAME yay --needed --noconfirm -Syu $packages
-	
-	# Delete 
-	sudo -u $USER_NAME yay --noconfirm -Rns $delete
+	# Delete
+	sudo -u $USER_NAME yay --needed --noconfirm -Rns $delete
 	
 	# Configure bluetooth
 	sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
@@ -150,7 +161,7 @@ install_packages() {
 	# Enable systemd services
 	systemctl enable $services
 
-	# Configure fish
+	# Configure shell
 	chsh $USER_NAME -s /usr/bin/fish
 	
 	# Install Grub theme (https://github.com/vinceliuice/grub2-themes)
