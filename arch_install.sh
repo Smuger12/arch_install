@@ -43,8 +43,8 @@ USER_NAME='eryk'
 USER_PASSWORD=$ROOT_PASSWORD
 
 # Choose DE
-DE=kde
-#DE=gnome
+DE='kde'
+#DE='gnome'
 
 # Choose keyboard layout
 KEYMAP='pl'
@@ -108,7 +108,7 @@ install_packages() {
 	packages="$packages ttf-dejavu noto-fonts noto-fonts-emoji ttf-hack"
 	
 	# Pamac
-	#packages="$packages pamac-aur pamac-cli"
+	#packages="$packages pamac-aur"
 	
 	# Browser
 	packages="$packages firefox"
@@ -165,7 +165,7 @@ install_packages() {
 	chsh $USER_NAME -s /usr/bin/fish
 	
 	# Install Grub theme (https://github.com/vinceliuice/grub2-themes)
-	echo "Instaling custom Grub theme"
+	echo "Instaling Grub theme"
 	git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
 	sudo -u $USER_NAME chown $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
 	/home/$USER_NAME/grub-themes/install.sh --boot --vimix --2k --white
@@ -174,8 +174,7 @@ install_packages() {
 #=======
 # SETUP
 #=======
-greeter() {
-	
+greeter() {	
 	clear
 	cat <<EOF
 
@@ -260,7 +259,7 @@ auto_partition() {
 
 	case $(echo "$VAR_SIZE > 0" | bc) in
 	1)
-		var_end=$(echo "$VAR_SIZE  * 1024 + $home_end" | bc)
+		var_end=$(echo "$VAR_SIZE * 1024 + $home_end" | bc)
 		var=0
 		;;
 	*) var_end="$home_end" ;;
