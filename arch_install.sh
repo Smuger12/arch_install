@@ -526,6 +526,7 @@ Defaults env_reset
 Defaults pwfeedback
 Defaults passwd_timeout=0
 Defaults lecture="once"
+Defaults env_editor
 
 # User privilege specification
 root   ALL=(ALL) ALL
