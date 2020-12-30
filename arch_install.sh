@@ -145,15 +145,15 @@ install_packages() {
 		services="$services sddm"
 		delete="plasma-vault plasma-thunderbolt oxygen discover"
 	elif [ "$DE" = "gnome" ]; then
-		packages="$packages xorg gnome gnome-tweaks archlinux-wallpaper gnome-usage materia-gtk-theme papirus-icon-theme"
+		packages="$packages xorg gnome gnome-tweaks archlinux-wallpaper materia-gtk-theme papirus-icon-theme"
 		delete="epiphany gnome-books gnome-boxes gnome-calendar gnome-clocks gnome-software gnome-characters gnome-getting-started-docs gnome-font-viewer gnome-documents yelp simple-scan gnome-wheather gnome-user-docs gnome-contacts"
 		services="$services gdm"
 	fi
 
 	# Install
-	sudo -u $USER_NAME yay --needed --noconfirm -Syu $packages
+	sudo -u $USER_NAME yay --noconfirm -Syu $packages
 	# Delete
-	sudo -u $USER_NAME yay --needed --noconfirm -Rns $delete
+	sudo -u $USER_NAME pacman --noconfirm -Rns $delete
 	
 	# Configure bluetooth
 	sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
