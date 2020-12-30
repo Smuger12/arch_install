@@ -526,7 +526,7 @@ Defaults env_reset
 Defaults pwfeedback
 Defaults passwd_timeout=0
 Defaults lecture="once"
-Defaults env_editor
+Defaults editor=/usr/bin/micro
 
 # User privilege specification
 root   ALL=(ALL) ALL
