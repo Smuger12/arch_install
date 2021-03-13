@@ -69,6 +69,8 @@ KERNEL='linux-zen linux-lts'
 # For generic stuff
 VIDEO_DRIVER="vesa"
 
+REFLECTOR_COUNTRY="Poland,Germany"
+
 # Choose hosts file type or leave blank for "default" hosts
 # Credit to https://github.com/StevenBlack/hosts
 # Hosts file type:
@@ -427,7 +429,7 @@ EOF
 
 set_mirrorlist() {
 	pacman --noconfirm -Sy reflector
-	reflector --latest 200 --age 24 --sort rate --save /etc/pacman.d/mirrorlist
+	reflector --latest 20 --age 24 --sort rate --protocol https --country $REFLECTOR_COUNTRY --save /etc/pacman.d/mirrorlist
 }
 
 install_base() {
