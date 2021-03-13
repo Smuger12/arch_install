@@ -168,7 +168,7 @@ install_packages() {
 	echo "Instaling Grub theme"
 	git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
 	sudo -u $USER_NAME chown $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
-	/home/$USER_NAME/grub-themes/install.sh --boot --vimix --2k --white
+	/home/$USER_NAME/grub-themes/install.sh -b -t vimix -s 2k -i white
 }
 
 #=======
