@@ -69,7 +69,12 @@ KERNEL='linux-zen linux-lts'
 # For generic stuff
 VIDEO_DRIVER="vesa"
 
+# Choose mirrors
 REFLECTOR_COUNTRY="Poland,Germany"
+
+# Choose aur helper
+AUR_HELPER="paru"
+#AUR_HELPER="yay"
 
 # Choose hosts file type or leave blank for "default" hosts
 # Credit to https://github.com/StevenBlack/hosts
@@ -90,13 +95,13 @@ REFLECTOR_COUNTRY="Poland,Germany"
 # fakenews-porn-social
 # gambling-porn-social
 # fakenews-gambling-porn-social
-HOSTS_FILE_TYPE=""
+HOSTS_FILE_TYPE="unified"
 
 # Customize to install other packages
 install_packages() {
 
 	# General utilities
-	packages="reflector htop rfkill sudo unrar unzip wget zip xdg-user-dirs tlp exa fish git"
+	packages="reflector htop rfkill sudo unrar unzip wget zip xdg-user-dirs tlp exa fish git update-grub"
 	#services="tlp"
 
 	# Sound
@@ -116,7 +121,7 @@ install_packages() {
 	packages="$packages firefox"
 
 	# Terminal apps
-	packages="$packages micro-bin xclip neofetch"
+	packages="$packages micro-git xclip neofetch"
 
 	# Multimedia
 	packages="$packages vlc"
@@ -142,6 +147,7 @@ install_packages() {
 		packages="$packages xf86-video-vesa"
 	fi
 	
+	# DE
 	if [ "$DE" = "kde" ]; then
 		packages="$packages xorg plasma konsole dolphin gwenview okular ark archlinux-wallpaper sddm kwalletmanager"
 		services="$services sddm"
@@ -153,7 +159,7 @@ install_packages() {
 	fi
 
 	# Install
-	sudo -u $USER_NAME yay --noconfirm -Syu $packages
+	sudo -u $USER_NAME $AUR_HELPER --noconfirm -Syu $packages
 	# Delete
 	sudo -u $USER_NAME pacman --noconfirm -Rns $delete
 	
@@ -181,7 +187,7 @@ greeter() {
 	cat <<EOF
 
        /\\
-      /  \\       Arch Linux install script for the lazy
+      /  \\       Arch Linux install script for the lazys ;)
      /\\   \\      Written by Cherrry9 (https://github.com/Cherrry9)
     /  ..  \\     Forked by Smuger12 (https://github.com/Smuger12)
    /  '  '  \\
@@ -533,7 +539,7 @@ Defaults editor=/usr/bin/micro
 # User privilege specification
 root   ALL=(ALL) ALL
 %wheel ALL=(ALL) ALL
-%wheel ALL=(ALL) NOPASSWD: /bin/makepkg,/bin/pacman,/bin/yay
+#%wheel ALL=(ALL) NOPASSWD: /bin/makepkg,/bin/pacman,/bin/yay
 EOF
 }
 
@@ -548,13 +554,22 @@ set_boot() {
 	grub-mkconfig -o /boot/grub/grub.cfg
 }
 
-install_yay() {
-	git clone https://aur.archlinux.org/yay-bin.git /yay
-	cd /yay
-	chown $USER_NAME:$USER_NAME /yay
-	sudo -u $USER_NAME makepkg -si --noconfirm
-	cd /
-	rm -rf /yay
+install_aur_helper() {
+	if [ "$AUR_HELPER" = "yay" ]; then
+		git clone https://aur.archlinux.org/yay-bin.git /yay
+		cd /yay
+		chown $USER_NAME:$USER_NAME /yay
+		sudo -u $USER_NAME makepkg -si --noconfirm
+		cd /
+		rm -rf /yay
+	elif [ "$AUR_HELPER" = "paru" ]; then
+		git clone https://aur.archlinux.org/paru-bin.git /paru
+		cd /paru
+		chown $USER_NAME:$USER_NAME /paru
+		sudo -u $USER_NAME makepkg -si --noconfirm
+		cd /
+		rm -rf /paru
+	fi
 }
 
 disable_pc_speaker() {
@@ -562,7 +577,7 @@ disable_pc_speaker() {
 }
 
 clean_packages() {
-	yes | yay -Scc
+	yes | $AUR_HELPER -Scc
 }
 
 set_pacman() {
@@ -729,8 +744,8 @@ configure() {
 	echo "Setting makepkg"
 	set_makepkg
 
-	echo 'Installing yay'
-	install_yay
+	echo 'Installing aur helper'
+	install_aur_helper
 
 	echo 'Installing and configuring additional packages'
 	install_packages
