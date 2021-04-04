@@ -59,13 +59,12 @@ KERNEL='linux-zen linux-lts'
 # Choose your video driver
 # For Intel
 #VIDEO_DRIVER="i915"
-
 # For (f*cking) Nvidia 
 #VIDEO_DRIVER="nouveau"
-
+# or
+#VIDEO_DRIVER="nvidia"
 # For ATI
 #VIDEO_DRIVER="radeon"
-
 # For generic stuff
 VIDEO_DRIVER="vesa"
 
@@ -141,6 +140,8 @@ install_packages() {
 		packages="$packages xf86-video-intel libva-intel-driver"
 	elif [ "$VIDEO_DRIVER" = "nouveau" ]; then
 		packages="$packages xf86-video-nouveau"
+	elif [ "$VIDEO_DRIVER" = "nvidia" ]; then
+		packages="$packages nvidia-dkms nvidia-utils nvidia-settings"
 	elif [ "$VIDEO_DRIVER" = "radeon" ]; then
 		packages="$packages xf86-video-ati"
 	elif [ "$VIDEO_DRIVER" = "vesa" ]; then
