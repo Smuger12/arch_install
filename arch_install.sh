@@ -77,7 +77,7 @@ AUR_HELPER="paru"
 
 # Choose bootloader
 BOOTLOADER="grub"
-#BOOTLOADER="refind"
+#BOOTLOADER="refind"  # refind maybe works...
 
 # Choose hosts file type or leave blank for "default" hosts
 # Credit to https://github.com/StevenBlack/hosts
