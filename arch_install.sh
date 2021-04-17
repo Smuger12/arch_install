@@ -75,6 +75,10 @@ REFLECTOR_COUNTRY="Poland,Germany"
 AUR_HELPER="paru"
 #AUR_HELPER="yay"
 
+# Choose bootloader
+BOOTLOADER="grub"
+#BOOTLOADER="refind"
+
 # Choose hosts file type or leave blank for "default" hosts
 # Credit to https://github.com/StevenBlack/hosts
 # Hosts file type:
@@ -545,14 +549,24 @@ EOF
 }
 
 set_boot() {
-	boot_type="$1"
-	if [ "$boot_type" = 'efi' ]; then
-		pacman -Sy --noconfirm efibootmgr
-		grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=ARCH --removable
-	else
-		grub-install --target=i386-pc "$DRIVE"
+	if ["$BOOTLOADER" = "grub" ]; then
+		boot_type="$1"
+		if [ "$boot_type" = "efi" ]; then
+			pacman -S --noconfirm efibootmgr
+			grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB_ARCH --removable
+		elif [ "$boot_type" = "legacy" ]; then
+			grub-install --target=i386-pc "$DRIVE"
+		fi
+		grub-mkconfig -o /boot/grub/grub.cfg
+	elif ["$BOOTLOADER" = "refind" ]; then
+		pacman -S efibootmgr refind
+		cat >/boot/refind_linux.conf <<EOF
+"Boot using default options"     "root=LABEL=ROOT rw add_efi_memmap initrd=boot\$UCODE.img"
+"Boot using fallback initramfs"  "root=LABEL=ROOT rw add_efi_memmap initrd=boot\$UCODE.img"
+"Boot to terminal"               "root=LABEL=ROOT rw add_efi_memmap initrd=boot\$UCODE.img systemd.unit=multi-user.target"
+EOF
+		refind-install
 	fi
-	grub-mkconfig -o /boot/grub/grub.cfg
 }
 
 install_aur_helper() {
