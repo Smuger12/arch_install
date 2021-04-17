@@ -5,12 +5,20 @@ Install Arch Linux (with KDE Plasma or Gnome DE) on EFI/Legacy with Grub (*with 
 
 1. Clone script.
 
-`git clone https://github.com/Smuger12/arch_install`
+```bash
+git clone https://github.com/Smuger12/arch_install
+```
 
 2. Customize the variables at the beginning of the script according to your preferences.
 
-`vim arch_install/arch_install.sh`
+```bash
+vim arch_install/arch_install.sh
+```
 
 3. Run script.
 
-`./arch_install/arch_install.sh`
+```bash
+./arch_install/arch_install.sh
+```
+<br><br><br><br><br><br>
+Before running this script, please read what it does ;)
