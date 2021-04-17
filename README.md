@@ -21,4 +21,4 @@ vim arch_install/arch_install.sh
 ./arch_install/arch_install.sh
 ```
 <br><br><br><br><br>
-<font color='red'>**Before running this script, please read what it does ;)**</font>
+<span style="color: red;">**Before running this script, please read what it does ;)**</span>
