@@ -43,7 +43,7 @@ USER_NAME='eryk'
 USER_PASSWORD=$ROOT_PASSWORD
 
 # Choose DE
-DE='kde'
+#DE='kde'
 #DE='gnome'
 
 # Choose keyboard layout
@@ -53,8 +53,8 @@ KEYMAP='pl'
 UCODE='intel-ucode'
 #UCODE='amd-ucode'
 
-# Linux kernel
-KERNEL='linux-zen linux-lts'
+# Kernels to install
+KERNEL='linux-zen linux-lts linux-zen-headers linux-lts-headers'
 
 # Choose your video driver
 # For Intel
@@ -77,7 +77,12 @@ AUR_HELPER="paru"
 
 # Choose bootloader
 BOOTLOADER="grub"
-#BOOTLOADER="refind"  # refind maybe works...
+#BOOTLOADER="refind" # maybe works...
+
+# Grub theme (https://github.com/vinceliuice/grub2-themes)
+GRUB_THEME="vimix"
+GRUB_THEME_ICONS="white"
+GRUB_THEME_RES="1080p"
 
 # Choose hosts file type or leave blank for "default" hosts
 # Credit to https://github.com/StevenBlack/hosts
@@ -98,7 +103,7 @@ BOOTLOADER="grub"
 # fakenews-porn-social
 # gambling-porn-social
 # fakenews-gambling-porn-social
-HOSTS_FILE_TYPE="unified"
+HOSTS_FILE_TYPE=""
 
 # Customize to install other packages
 install_packages() {
@@ -115,7 +120,7 @@ install_packages() {
 	services="$services NetworkManager"
 
 	# Fonts
-	packages="$packages ttf-dejavu noto-fonts noto-fonts-emoji ttf-hack"
+	packages="$packages ttf-dejavu noto-fonts noto-fonts-emoji ttf-hack ttf-droid"
 	
 	# Pamac
 	#packages="$packages pamac-aur"
@@ -123,7 +128,7 @@ install_packages() {
 	# Browser
 	packages="$packages firefox"
 
-	# Terminal apps
+	# Terminal programs
 	packages="$packages micro-git xclip neofetch"
 
 	# Multimedia
@@ -175,13 +180,15 @@ install_packages() {
 	systemctl enable $services
 
 	# Configure shell
-	chsh $USER_NAME -s /usr/bin/fish
+	chsh -s /usr/bin/fish $USER_NAME
 	
-	# Install Grub theme (https://github.com/vinceliuice/grub2-themes)
-	echo "Instaling Grub theme"
-	git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
-	sudo -u $USER_NAME chown $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
-	/home/$USER_NAME/grub-themes/install.sh -b -t vimix -s 2k -i white
+	# Install Grub theme (from https://github.com/vinceliuice/grub2-themes)
+	if ["$BOOTLOADER" = "grub" ]; then
+		echo "Instaling Grub theme"
+		git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
+		sudo -u $USER_NAME chown $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
+		/home/$USER_NAME/grub-themes/install.sh -b -t $GRUB_THEME -s $GRUB_THEME_RES -i $GRUB_THEME_ICONS
+	fi
 }
 
 #=======
@@ -541,10 +548,8 @@ Defaults passwd_timeout=0
 Defaults lecture="once"
 Defaults editor=/usr/bin/micro
 
-# User privilege specification
 root   ALL=(ALL) ALL
 %wheel ALL=(ALL) ALL
-#%wheel ALL=(ALL) NOPASSWD: /bin/makepkg,/bin/pacman,/bin/yay
 EOF
 }
 
@@ -765,7 +770,7 @@ configure() {
 	echo 'Installing and configuring additional packages'
 	install_packages
 
-	echo 'Clearing yay/pacman cache'
+	echo 'Clearing aur helper/pacman cache'
 	clean_packages
 
 	echo 'Disabling PC speaker'
