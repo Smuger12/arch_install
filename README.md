@@ -20,5 +20,5 @@ vim arch_install/arch_install.sh
 ```bash
 ./arch_install/arch_install.sh
 ```
-<br><br><br><br><br><br>
-Before running this script, please read what it does ;)
+<br><br><br><br><br>
+**Before running this script, please read what it does ;)**
