@@ -42,49 +42,55 @@ USER_NAME='eryk'
 # The main user's password (leave blank to be prompted).
 USER_PASSWORD=$ROOT_PASSWORD
 
-# Choose DE
+# Choose DE.
 #DE='kde'
-#DE='gnome'
+DE='gnome'
 
-# Choose keyboard layout
-KEYMAP='pl'
+# Choose keyboard layout (using localectl for this, see below or here: https://man.archlinux.org/man/localectl.1.en).
+VCONSOLE_KEYMAP='uk'
+X11_KEYMAP_LAYOUT='gb'
+X11_KEYMAP_VARIANT='pl'
+X11_KEYMAP_MODEL='pc105'
 
-# Choose CPU microcode
+# Choose CPU microcode.
 UCODE='intel-ucode'
 #UCODE='amd-ucode'
 
-# Kernels to install
-KERNEL='linux-zen linux-lts linux-zen-headers linux-lts-headers'
+# List of kernels to install.
+KERNEL='linux-zen linux-zen-headers linux-lts linux-lts-headers'
 
-# Choose your video driver
+# Choose your video driver.
 # For Intel
 #VIDEO_DRIVER="i915"
+
 # For (f*cking) Nvidia 
 #VIDEO_DRIVER="nouveau"
 # or
-#VIDEO_DRIVER="nvidia"
+#VIDEO_DRIVER="nvidia"  # remember to install kernel headers
+
 # For ATI
 #VIDEO_DRIVER="radeon"
+
 # For generic stuff
 VIDEO_DRIVER="vesa"
 
-# Choose mirrors
+# Choose mirrors.
 REFLECTOR_COUNTRY="Poland,Germany"
 
-# Choose aur helper
+# Choose aur helper.
 AUR_HELPER="paru"
 #AUR_HELPER="yay"
 
-# Choose bootloader
+# Choose bootloader.
 BOOTLOADER="grub"
-#BOOTLOADER="refind" # maybe works...
+#BOOTLOADER="refind"  # idk if it works :P
 
-# Grub theme (https://github.com/vinceliuice/grub2-themes)
+# Grub theme (from https://github.com/vinceliuice/grub2-themes).
 GRUB_THEME="vimix"
 GRUB_THEME_ICONS="white"
 GRUB_THEME_RES="1080p"
 
-# Choose hosts file type or leave blank for "default" hosts
+# Choose hosts file type or leave blank for "default" hosts.
 # Credit to https://github.com/StevenBlack/hosts
 # Hosts file type:
 # unified (adware + malware)
@@ -105,12 +111,11 @@ GRUB_THEME_RES="1080p"
 # fakenews-gambling-porn-social
 HOSTS_FILE_TYPE=""
 
-# Customize to install other packages
+# Customize to install other packages.
 install_packages() {
 
 	# General utilities
-	packages="reflector htop rfkill sudo unrar unzip wget zip xdg-user-dirs tlp exa fish git update-grub"
-	#services="tlp"
+	packages="reflector htop rfkill sudo unrar unzip wget zip xdg-user-dirs exa fish git update-grub"
 
 	# Sound
 	packages="$packages alsa-utils pulseaudio pulseaudio-alsa"
@@ -122,6 +127,9 @@ install_packages() {
 	# Fonts
 	packages="$packages ttf-dejavu noto-fonts noto-fonts-emoji ttf-hack ttf-droid"
 	
+	# Theme
+	packages="$packages materia-gtk-theme papirus-icon-theme"
+	
 	# Pamac
 	#packages="$packages pamac-aur"
 	
@@ -129,7 +137,7 @@ install_packages() {
 	packages="$packages firefox"
 
 	# Terminal programs
-	packages="$packages micro-git xclip neofetch"
+	packages="$packages micro xclip wl-clipboard neofetch"
 
 	# Multimedia
 	packages="$packages vlc"
@@ -138,7 +146,8 @@ install_packages() {
 	packages="$packages discord"
 
 	# For laptops
-	packages="$packages xf86-input-libinput"
+	packages="$packages xf86-input-libinput auto-cpufreq"
+	services="$services auto-cpufreq"
 
 	# Bluetooth
 	packages="$packages bluez bluez-utils pulseaudio-bluetooth"
@@ -163,7 +172,7 @@ install_packages() {
 		services="$services sddm"
 		delete="plasma-vault plasma-thunderbolt oxygen discover"
 	elif [ "$DE" = "gnome" ]; then
-		packages="$packages xorg gnome gnome-tweaks archlinux-wallpaper materia-gtk-theme papirus-icon-theme"
+		packages="$packages xorg gnome gnome-tweaks archlinux-wallpaper"
 		delete="epiphany gnome-books gnome-boxes gnome-calendar gnome-clocks gnome-software gnome-characters gnome-getting-started-docs gnome-font-viewer gnome-documents yelp simple-scan gnome-wheather gnome-user-docs gnome-contacts"
 		services="$services gdm"
 	fi
@@ -177,7 +186,7 @@ install_packages() {
 	sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
 
 	# Enable systemd services
-	systemctl enable $services
+	systemctl enable systemd-localed $services
 
 	# Configure shell
 	chsh -s /usr/bin/fish $USER_NAME
@@ -451,6 +460,7 @@ set_mirrorlist() {
 }
 
 install_base() {
+	sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 10/g' /etc/pacman.conf
 	pacstrap /mnt base base-devel $KERNEL $UCODE linux-firmware git grub
 	genfstab -U /mnt >/mnt/etc/fstab
 }
@@ -472,7 +482,8 @@ arch_chroot() {
 	else
 		echo 'Unmounting filesystems'
 		unmount_filesystems
-		echo 'Done! Reboot system.'
+		echo 'DONE!'
+		echo 'Reboot the system.'
 	fi
 
 }
@@ -509,10 +520,8 @@ EOF
 }
 
 set_keymap() {
-	keymap="$1"
-	cat >/etc/vconsole.conf <<EOF
-KEYMAP=$keymap
-EOF
+	localectl --no-ask-password --no-convert set-keymap $VCONSOLE_KEYMAP
+	localectl --no-ask-password --no-convert set-x11-keymap $X11_KEYMAP_LAYOUT $X11_KEYMAP_MODEL $X11_KEYMAP_VARIANT
 }
 
 set_timezone() {
@@ -634,10 +643,12 @@ TotalDownload
 CheckSpace
 VerbosePkgLists
 ILoveCandy
+ParallelDownloads = 10
 
 SigLevel    = Required DatabaseOptional
 LocalFileSigLevel = Optional
 #RemoteFileSigLevel = Required
+
 
 #[testing]
 #Include = /etc/pacman.d/mirrorlist
