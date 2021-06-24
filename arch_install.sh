@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-# Drives to install to.
+# Drive to install Arch Linux.
 DRIVE='/dev/sda'
 
 # Set partitioning method to auto/manual
@@ -47,10 +47,16 @@ USER_PASSWORD=$ROOT_PASSWORD
 DE='gnome'
 
 # Choose keyboard layout (using localectl for this, see below or here: https://man.archlinux.org/man/localectl.1.en).
-VCONSOLE_KEYMAP='uk'
-X11_KEYMAP_LAYOUT='gb'
-X11_KEYMAP_VARIANT='pl'
-X11_KEYMAP_MODEL='pc105'
+VCONSOLE_KEYMAP='us'
+X11_KEYMAP_LAYOUT='us'
+X11_KEYMAP_VARIANT='us'
+X11_KEYMAP_MODEL='pc104'
+
+# For my laptop
+#VCONSOLE_KEYMAP='uk'
+#X11_KEYMAP_LAYOUT='gb'
+#X11_KEYMAP_VARIANT='pl'
+#X11_KEYMAP_MODEL='pc105'
 
 # Choose CPU microcode.
 UCODE='intel-ucode'
@@ -143,7 +149,7 @@ install_packages() {
 	packages="$packages micro xclip wl-clipboard neofetch"
 
 	# Multimedia
-	packages="$packages vlc"
+	#packages="$packages vlc"
 
 	# Communicators
 	packages="$packages discord"
@@ -179,6 +185,48 @@ install_packages() {
 		packages="$packages xorg gnome gnome-tweaks archlinux-wallpaper"
 		delete="epiphany gnome-books gnome-boxes gnome-calendar gnome-clocks gnome-software gnome-characters gnome-getting-started-docs gnome-font-viewer gnome-documents yelp simple-scan gnome-wheather gnome-user-docs gnome-contacts"
 		services="$services gdm"
+	fi
+	
+	if [ $AUR_HELPER = "paru" ]; then
+		cat >/etc/paru.conf <<EOF
+#
+# $PARU_CONF
+# /etc/paru.conf
+# ~/.config/paru/paru.conf
+#
+# See the paru.conf(5) manpage for options
+
+#
+# GENERAL OPTIONS
+#
+[options]
+PgpFetch
+Devel
+Provides
+DevelSuffixes = -git -cvs -svn -bzr -darcs -always
+#BottomUp
+RemoveMake
+SudoLoop
+UseAsk
+#CombinedUpgrade
+CleanAfter
+UpgradeMenu
+#NewsOnUpgrade
+SkipReview
+
+#LocalRepo
+#Chroot
+#Sign
+#SignDb
+
+#
+# Binary OPTIONS
+#
+#[bin]
+#FileManager = vifm
+#MFlags = --skippgpcheck
+#Sudo = doas
+EOF
 	fi
 
 	# Install
