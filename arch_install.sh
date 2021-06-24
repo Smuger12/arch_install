@@ -642,7 +642,6 @@ Architecture = auto
 # Misc options
 #UseSyslog
 Color
-TotalDownload
 CheckSpace
 VerbosePkgLists
 ILoveCandy
