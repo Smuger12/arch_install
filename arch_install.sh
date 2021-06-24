@@ -522,8 +522,11 @@ EOF
 	fi
 }
 
-set_keymap() {
+set_vconsole_keymap() {
 	localectl --no-ask-password --no-convert set-keymap $VCONSOLE_KEYMAP
+}
+
+set_x11_keymap() {
 	localectl --no-ask-password --no-convert set-x11-keymap $X11_KEYMAP_LAYOUT $X11_KEYMAP_MODEL $X11_KEYMAP_VARIANT
 }
 
@@ -746,8 +749,8 @@ configure() {
 	echo "Setting hosts"
 	set_hosts "$HOSTNAME" "$HOSTS_FILE_TYPE"
 
-	echo "Setting keymap"
-	set_keymap
+	echo "Setting vconsole keymap"
+	set_vconsole_keymap
 
 	echo 'Setting bootloader'
 	set_boot "$BOOT_TYPE"
@@ -784,6 +787,9 @@ configure() {
 
 	echo 'Installing and configuring additional packages'
 	install_packages
+	
+	echo "Setting X11 keymap"
+	set_vconsole_keymap
 
 	#echo 'Clearing aur helper/pacman cache'
 	#clean_packages
