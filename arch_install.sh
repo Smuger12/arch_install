@@ -460,8 +460,7 @@ set_mirrorlist() {
 }
 
 install_base() {
-	sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 10/g' /etc/pacman.conf
-	pacstrap /mnt base base-devel $KERNEL $UCODE linux-firmware git grub
+	pacstrap /mnt base base-devel $KERNEL $UCODE linux-firmware git grub ntfs-3g dosfstools
 	genfstab -U /mnt >/mnt/etc/fstab
 }
 
@@ -605,9 +604,9 @@ disable_pc_speaker() {
 	echo "blacklist pcspkr" >>/etc/modprobe.d/nobeep.conf
 }
 
-clean_packages() {
-	yes | $AUR_HELPER -Scc
-}
+#clean_packages() {
+#	yes | $AUR_HELPER -Scc
+#}
 
 set_pacman() {
 	cat >/etc/pacman.conf <<EOF
@@ -709,6 +708,8 @@ setup() {
 		manual_partition
 	fi
 	format_and_mount
+	
+	set_pacman
 
 	echo "Setting mirrorlist"
 	set_mirrorlist
@@ -743,7 +744,7 @@ configure() {
 	set_hosts "$HOSTNAME" "$HOSTS_FILE_TYPE"
 
 	echo "Setting keymap"
-	set_keymap $KEYMAP
+	set_keymap
 
 	echo 'Setting bootloader'
 	set_boot "$BOOT_TYPE"
@@ -781,8 +782,8 @@ configure() {
 	echo 'Installing and configuring additional packages'
 	install_packages
 
-	echo 'Clearing aur helper/pacman cache'
-	clean_packages
+	#echo 'Clearing aur helper/pacman cache'
+	#clean_packages
 
 	echo 'Disabling PC speaker'
 	disable_pc_speaker
