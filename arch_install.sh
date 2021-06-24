@@ -9,7 +9,7 @@ PARTITIONING='auto'
 
 # Set boot type on efi/legacy
 # if blank automaticly detect
-BOOT_TYPE=''
+BOOT_TYPE='efi'
 
 # Partitions (only in use if PARTITIONING is set to auto);
 # HOME (set 0 or leave blank to not create home partition).
@@ -282,8 +282,8 @@ network() {
 detect_boot_type() {
 	BOOT_TYPE=$(ls /sys/firmware/efi/efivars 2>/dev/null)
 	[ "$BOOT_TYPE" ] &&
-		BOOT_TYPE='efi' ||
-		BOOT_TYPE='legacy'
+		BOOT_TYPE="efi" ||
+		BOOT_TYPE="legacy"
 }
 
 format_and_mount() {
