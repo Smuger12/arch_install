@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Drive to install Arch Linux.
-# DUALBOOT NOT SUPPORTED!
+# DUALBOOT IS NOT SUPPORTED!
 DRIVE='/dev/sda'
 
 # Set partitioning method to auto/manual
@@ -609,14 +609,17 @@ set_sudoers() {
 Defaults env_reset
 Defaults pwfeedback
 Defaults passwd_timeout=0
-Defaults lecture="once"
+Defaults lecture="always"
+Defaults lecture_file=/etc/sudo_lecture.txt
 #Defaults editor=/usr/bin/micro
 
 root   ALL=(ALL) ALL
 %wheel ALL=(ALL) ALL
 EOF
+	curl https://www.cyberciti.biz/files/groot.txt -o /etc/sudo_lecture.txt
 }
 
+# THIS IS TEMPORARY! 
 set_temp_sudoers() {
 	cat >/etc/sudoers <<EOF
 # /etc/sudoers
@@ -629,9 +632,10 @@ set_temp_sudoers() {
 Defaults env_reset
 Defaults pwfeedback
 Defaults passwd_timeout=0
-Defaults lecture="off"
+Defaults lecture="never"
 
 root   ALL=(ALL) ALL
+# THIS IS TEMPORARY! 
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/pacman
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/$AUR_HELPER
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/localectl
@@ -854,11 +858,12 @@ configure() {
 	echo 'Installing and configuring additional packages'
 	install_packages
 	
-	echo 'Clearing aur helper/pacman cache'
-	clean_packages
-	
 	echo "Setting X11 keymap"
 	set_vconsole_keymap
+	
+	echo 'Clearing AUR helper/pacman cache'
+	clean_packages
+	echo ' '
 	
 	echo 'Setting true sudoers config'
 	set_sudoers
