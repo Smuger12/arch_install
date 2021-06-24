@@ -74,6 +74,9 @@ KERNEL='linux-zen linux-zen-headers linux-lts linux-lts-headers'
 # For generic stuff
 VIDEO_DRIVER="vesa"
 
+# virtualbox guest utils
+#VIDEO_DRIVER="vbox"
+
 # Choose mirrors.
 REFLECTOR_COUNTRY="Poland,Germany"
 
@@ -164,8 +167,9 @@ install_packages() {
 		packages="$packages xf86-video-ati"
 	elif [ "$VIDEO_DRIVER" = "vesa" ]; then
 		packages="$packages xf86-video-vesa"
+	elif [ "$VIDEO_DRIVER" = "vbox" ]; then
+		packages="$packages virtualbox-guest-utils"
 	fi
-	
 	# DE
 	if [ "$DE" = "kde" ]; then
 		packages="$packages xorg plasma konsole dolphin gwenview okular ark archlinux-wallpaper sddm kwalletmanager"
