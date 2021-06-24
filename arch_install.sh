@@ -643,7 +643,7 @@ EOF
 }
 
 set_boot() {
-	if ["$BOOTLOADER" = "grub" ]; then
+	if [ "$BOOTLOADER" = "grub" ]; then
 		if [ "$BOOT_TYPE" = "efi" ]; then
 			pacman -S --noconfirm efibootmgr
 			grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB_ARCH --removable
@@ -651,7 +651,7 @@ set_boot() {
 			grub-install --target=i386-pc "$DRIVE"
 		fi
 		grub-mkconfig -o /boot/grub/grub.cfg
-	elif ["$BOOTLOADER" = "refind" ]; then
+	elif [ "$BOOTLOADER" = "refind" ]; then
 		pacman -S efibootmgr refind
 		cat >/boot/refind_linux.conf <<EOF
 "Boot using default options"     "root=LABEL=ROOT rw add_efi_memmap initrd=boot\$UCODE.img"
