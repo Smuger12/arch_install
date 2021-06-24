@@ -616,13 +616,34 @@ root   ALL=(ALL) ALL
 EOF
 }
 
+set_temp_sudoers() {
+	cat >/etc/sudoers <<EOF
+# /etc/sudoers
+#
+# This file MUST be edited with the 'visudo' command as root.
+#
+# See the man page for details on how to write a sudoers file.
+#
+
+Defaults env_reset
+Defaults pwfeedback
+Defaults passwd_timeout=0
+Defaults lecture="once"
+Defaults editor=/usr/bin/micro
+
+root   ALL=(ALL) ALL
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/yay
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/pacman
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/paru
+EOF
+}
+
 set_boot() {
 	if ["$BOOTLOADER" = "grub" ]; then
-		boot_type="$1"
-		if [ "$boot_type" = "efi" ]; then
+		if [ "$BOOT_TYPE" = "efi" ]; then
 			pacman -S --noconfirm efibootmgr
 			grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB_ARCH --removable
-		elif [ "$boot_type" = "legacy" ]; then
+		elif [ "$BOOT_TYPE" = "legacy" ]; then
 			grub-install --target=i386-pc "$DRIVE"
 		fi
 		grub-mkconfig -o /boot/grub/grub.cfg
@@ -659,9 +680,9 @@ disable_pc_speaker() {
 	echo "blacklist pcspkr" >>/etc/modprobe.d/nobeep.conf
 }
 
-#clean_packages() {
-#	yes | $AUR_HELPER -Scc
-#}
+clean_packages() {
+	yes | $AUR_HELPER -Scc
+}
 
 set_pacman() {
 	cat >/etc/pacman.conf <<EOF
@@ -801,7 +822,7 @@ configure() {
 	set_vconsole_keymap
 
 	echo 'Setting bootloader'
-	set_boot "$BOOT_TYPE"
+	set_boot
 
 	echo 'Setting root password'
 	[ ! "$ROOT_PASSWORD" ] && {
@@ -821,16 +842,16 @@ configure() {
 	}
 	create_user "$USER_NAME" "$USER_PASSWORD"
 
-	echo 'Setting sudoers'
-	set_sudoers
+	echo 'Setting temp sudoers config'
+	set_temp_sudoers
 
-	echo "Setting pacman"
+	echo "Setting pacman.conf"
 	set_pacman
 
-	echo "Setting makepkg"
+	echo "Setting makepkg.conf"
 	set_makepkg
 
-	echo 'Installing aur helper'
+	echo 'Installing AUR helper'
 	install_aur_helper
 
 	echo 'Installing and configuring additional packages'
@@ -839,8 +860,11 @@ configure() {
 	echo "Setting X11 keymap"
 	set_vconsole_keymap
 
-	#echo 'Clearing aur helper/pacman cache'
-	#clean_packages
+	echo 'Clearing aur helper/pacman cache'
+	clean_packages
+	
+	echo 'Setting true sudoers config'
+	set_sudoers
 
 	echo 'Disabling PC speaker'
 	disable_pc_speaker
