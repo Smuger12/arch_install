@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 
 # Drive to install Arch Linux.
+# DUALBOOT NOT SUPPORTED!
 DRIVE='/dev/sda'
 
 # Set partitioning method to auto/manual
@@ -228,14 +229,14 @@ SkipReview
 #Sudo = doas
 EOF
 	fi
-
+	
 	# Install
 	sudo -u $USER_NAME $AUR_HELPER --noconfirm -Syu $packages
 	# Delete
 	sudo -u $USER_NAME pacman --noconfirm -Rns $delete
 	
 	# Configure bluetooth
-	sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
+	#sudo -u $USER_NAME sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
 
 	# Enable systemd services
 	systemctl enable systemd-localed $services
@@ -609,7 +610,7 @@ Defaults env_reset
 Defaults pwfeedback
 Defaults passwd_timeout=0
 Defaults lecture="once"
-Defaults editor=/usr/bin/micro
+#Defaults editor=/usr/bin/micro
 
 root   ALL=(ALL) ALL
 %wheel ALL=(ALL) ALL
@@ -628,13 +629,12 @@ set_temp_sudoers() {
 Defaults env_reset
 Defaults pwfeedback
 Defaults passwd_timeout=0
-Defaults lecture="once"
-Defaults editor=/usr/bin/micro
+Defaults lecture="off"
 
 root   ALL=(ALL) ALL
-%wheel ALL=(ALL) NOPASSWD: /usr/bin/yay
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/pacman
-%wheel ALL=(ALL) NOPASSWD: /usr/bin/paru
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/$AUR_HELPER
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/localectl
 EOF
 }
 
@@ -797,9 +797,6 @@ setup() {
 }
 
 configure() {
-	# efi or legacy
-	BOOT_TYPE="$1"
-
 	echo "Setting locale"
 	set_locale "$LANG"
 
@@ -857,17 +854,17 @@ configure() {
 	echo 'Installing and configuring additional packages'
 	install_packages
 	
-	echo "Setting X11 keymap"
-	set_vconsole_keymap
-
 	echo 'Clearing aur helper/pacman cache'
 	clean_packages
+	
+	echo "Setting X11 keymap"
+	set_vconsole_keymap
 	
 	echo 'Setting true sudoers config'
 	set_sudoers
 
-	echo 'Disabling PC speaker'
-	disable_pc_speaker
+	#echo 'Disabling PC speaker'
+	#disable_pc_speaker
 
 	rm /setup.sh
 }
