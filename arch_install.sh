@@ -770,7 +770,7 @@ setup() {
 	network
 
 	if [ -e "$DRIVE" ]; then
-		printf "%s :: Are you sure? This disk will be formatted: [YES/no] " "$DRIVE"
+		printf "%s :: Are you sure? This disk will be formatted: [Type YES to confirm] " "$DRIVE"
 		read -r choice
 		[ ! "$choice" = "YES" ] && exit
 	else
