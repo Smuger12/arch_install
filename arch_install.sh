@@ -238,14 +238,14 @@ EOF
 	# Configure bluetooth
 	#sudo -u $USER_NAME sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
 
-	# Enable systemd services
-	systemctl enable systemd-localed $services
+	echo "Enabling systemd services"
+	sudo -u $USER_NAME systemctl enable systemd-localed $services
 
-	# Configure shell
+	echo "Setting default shell to fish"
 	chsh -s /usr/bin/fish $USER_NAME
 	
 	# Install Grub theme (from https://github.com/vinceliuice/grub2-themes)
-	if ["$BOOTLOADER" = "grub" ]; then
+	if [ "$BOOTLOADER" = "grub" ]; then
 		echo "Instaling Grub theme"
 		git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
 		sudo -u $USER_NAME chown $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
@@ -622,6 +622,7 @@ EOF
 # THIS IS TEMPORARY! 
 set_temp_sudoers() {
 	cat >/etc/sudoers <<EOF
+# THIS IS TEMPORARY! 
 # /etc/sudoers
 #
 # This file MUST be edited with the 'visudo' command as root.
@@ -639,6 +640,8 @@ root   ALL=(ALL) ALL
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/pacman
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/$AUR_HELPER
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/localectl
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/systemctl
+# THIS IS TEMPORARY! 
 EOF
 }
 
@@ -651,11 +654,15 @@ set_boot() {
 			grub-install --target=i386-pc "$DRIVE"
 		fi
 		grub-mkconfig -o /boot/grub/grub.cfg
+		echo "Disabling osprober"
+		echo "# Disable osprober" >> /etc/default/grub
+		echo "GRUB_DISABLE_OS_PROBER=true" >> /etc/default/grub
+		grub-mkconfig -o /boot/grub/grub.cfg
 	elif [ "$BOOTLOADER" = "refind" ]; then
 		pacman -S efibootmgr refind
 		cat >/boot/refind_linux.conf <<EOF
 "Boot using default options"     "root=LABEL=ROOT rw add_efi_memmap initrd=boot\$UCODE.img"
-"Boot using fallback initramfs"  "root=LABEL=ROOT rw add_efi_memmap initrd=boot\$UCODE.img"
+#"Boot using fallback initramfs"  "root=LABEL=ROOT rw add_efi_memmap initrd=boot\$UCODE.img"
 "Boot to terminal"               "root=LABEL=ROOT rw add_efi_memmap initrd=boot\$UCODE.img systemd.unit=multi-user.target"
 EOF
 		refind-install
@@ -793,7 +800,7 @@ setup() {
 	echo "Setting mirrorlist"
 	set_mirrorlist
 
-	echo "Installing base package"
+	echo "Installing base packages"
 	install_base
 
 	echo "Chrooting to new system"
@@ -816,13 +823,13 @@ configure() {
 
 	set_hostname "$HOSTNAME"
 
-	echo "Setting hosts"
+	echo "Setting hosts file"
 	set_hosts "$HOSTNAME" "$HOSTS_FILE_TYPE"
 
 	echo "Setting vconsole keymap"
 	set_vconsole_keymap
 
-	echo 'Setting bootloader'
+	echo 'Instaling and configuring bootloader'
 	set_boot
 
 	echo 'Setting root password'
