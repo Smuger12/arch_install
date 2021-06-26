@@ -261,7 +261,7 @@ greeter() {
 	cat <<EOF
 
        /\\
-      /  \\       Arch Linux install script for the lazys ;)
+      /  \\       Arch Linux install script for very lazy people ;)
      /\\   \\      Written by Cherrry9 (https://github.com/Cherrry9)
     /  ..  \\     Forked by Smuger12 (https://github.com/Smuger12)
    /  '  '  \\
@@ -513,7 +513,7 @@ set_mirrorlist() {
 }
 
 install_base() {
-	pacstrap /mnt base base-devel $KERNEL $UCODE linux-firmware git grub ntfs-3g dosfstools
+	pacstrap /mnt base base-devel $KERNEL $UCODE linux-firmware git ntfs-3g dosfstools
 	genfstab -U /mnt >/mnt/etc/fstab
 }
 
