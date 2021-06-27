@@ -85,7 +85,7 @@ VIDEO_DRIVER="vesa"
 #VIDEO_DRIVER="vbox"
 
 # Choose mirrors.
-REFLECTOR_COUNTRY="Poland,Germany"
+REFLECTOR_COUNTRY="Poland"
 
 # Choose aur helper.
 AUR_HELPER="paru"
@@ -233,7 +233,9 @@ EOF
 	# Install
 	sudo -u $USER_NAME $AUR_HELPER --noconfirm -Syu $packages
 	# Delete
-	sudo -u $USER_NAME pacman --noconfirm -Rns $delete
+	[ "$delete" ] && {
+		pacman --noconfirm -Rns $delete
+	}
 	
 	# Configure bluetooth
 	#sudo -u $USER_NAME sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
@@ -609,14 +611,12 @@ set_sudoers() {
 Defaults env_reset
 Defaults pwfeedback
 Defaults passwd_timeout=0
-Defaults lecture="always"
-Defaults lecture_file=/etc/sudo_lecture.txt
+Defaults lecture="never"
 #Defaults editor=/usr/bin/micro
 
 root   ALL=(ALL) ALL
 %wheel ALL=(ALL) ALL
 EOF
-	curl https://www.cyberciti.biz/files/groot.txt -o /etc/sudo_lecture.txt
 }
 
 # THIS IS TEMPORARY! 
@@ -639,7 +639,6 @@ root   ALL=(ALL) ALL
 # THIS IS TEMPORARY! 
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/pacman
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/$AUR_HELPER
-%wheel ALL=(ALL) NOPASSWD: /usr/bin/localectl
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/systemctl
 # THIS IS TEMPORARY! 
 EOF
@@ -655,6 +654,7 @@ set_boot() {
 		fi
 		grub-mkconfig -o /boot/grub/grub.cfg
 		echo "Disabling osprober"
+		echo " " >> /etc/default/grub
 		echo "# Disable osprober" >> /etc/default/grub
 		echo "GRUB_DISABLE_OS_PROBER=true" >> /etc/default/grub
 		grub-mkconfig -o /boot/grub/grub.cfg
@@ -795,6 +795,7 @@ setup() {
 	fi
 	format_and_mount
 	
+	echo "Setting pacman.conf"
 	set_pacman
 
 	echo "Setting mirrorlist"
