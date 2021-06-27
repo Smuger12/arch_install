@@ -235,7 +235,7 @@ EOF
 	# Delete
 	if [ -e "$delete" ]; then
 		echo "Removing unnecessary packages"
-		sudo -u $USER_NAME pacman --noconfirm -Rns $delete
+		pacman --noconfirm -Rns $delete
 	fi
 	
 	# Configure bluetooth
