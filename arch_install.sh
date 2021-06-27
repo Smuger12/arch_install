@@ -234,7 +234,7 @@ EOF
 	sudo -u $USER_NAME $AUR_HELPER --noconfirm -S $packages
 	# Delete
 	if [ -e "$delete" ]; then
-		pacman --noconfirm -Rns $delete
+		sudo -u $USER_NAME pacman --noconfirm -Rns $delete
 	fi
 	
 	# Configure bluetooth
