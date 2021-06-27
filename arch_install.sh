@@ -254,6 +254,12 @@ EOF
 		sudo -u $USER_NAME chown $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
 		/home/$USER_NAME/grub-themes/install.sh -b -t $GRUB_THEME -s $GRUB_THEME_RES -i $GRUB_THEME_ICONS
 	fi
+	
+	cat >/etc/environment <<EOF
+MOZ_ENABLE_WAYLAND=1
+#QT_QPA_PLATFORMTHEME=qt5ct
+QT_QPA_PLATFORM=wayland
+EOF
 }
 
 #=======
