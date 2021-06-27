@@ -231,11 +231,11 @@ EOF
 	fi
 	
 	# Install
-	sudo -u $USER_NAME $AUR_HELPER --noconfirm -Syu $packages
+	sudo -u $USER_NAME $AUR_HELPER --noconfirm -S $packages
 	# Delete
-	[ "$delete" ] && {
+	if [ -e "$delete" ]; then
 		pacman --noconfirm -Rns $delete
-	}
+	fi
 	
 	# Configure bluetooth
 	#sudo -u $USER_NAME sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
@@ -646,6 +646,7 @@ EOF
 
 set_boot() {
 	if [ "$BOOTLOADER" = "grub" ]; then
+		pacman -S --noconfirm grub
 		if [ "$BOOT_TYPE" = "efi" ]; then
 			pacman -S --noconfirm efibootmgr
 			grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB_ARCH --removable
