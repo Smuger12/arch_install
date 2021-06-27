@@ -260,7 +260,7 @@ MOZ_ENABLE_WAYLAND=1
 QT_QPA_PLATFORM=wayland
 EOF
 	if [ "$DE" = "gnome" ]; then
-		echo "QT_QPA_PLATFORMTHEME=qt5ct" >> /etc/environment
+		echo "QT_QPA_PLATFORMTHEME=gnome" >> /etc/environment
 	fi
 }
 
