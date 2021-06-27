@@ -181,10 +181,10 @@ install_packages() {
 	if [ "$DE" = "kde" ]; then
 		packages="$packages xorg plasma konsole dolphin gwenview okular ark archlinux-wallpaper sddm kwalletmanager"
 		services="$services sddm"
-		delete="plasma-vault plasma-thunderbolt oxygen discover"
+		#delete="plasma-vault plasma-thunderbolt oxygen discover"
 	elif [ "$DE" = "gnome" ]; then
-		packages="$packages xorg gnome gnome-tweaks archlinux-wallpaper"
-		delete="epiphany gnome-books gnome-boxes gnome-calendar gnome-clocks gnome-software gnome-characters gnome-getting-started-docs gnome-font-viewer gnome-documents yelp simple-scan gnome-wheather gnome-user-docs gnome-contacts"
+		packages="$packages xorg gnome gnome-tweaks dconf-editor gdm-tools-git archlinux-wallpaper"
+		#delete="epiphany gnome-books gnome-boxes gnome-calendar gnome-clocks gnome-software gnome-characters gnome-getting-started-docs gnome-font-viewer gnome-documents yelp simple-scan gnome-wheather gnome-user-docs gnome-contacts"
 		services="$services gdm"
 	fi
 	
@@ -233,9 +233,10 @@ EOF
 	# Install
 	sudo -u $USER_NAME $AUR_HELPER --noconfirm -S $packages
 	# Delete
-	if [ -e "$delete" ]; then
-		sudo -u $USER_NAME pacman --noconfirm -Rns $delete
-	fi
+	# idk why deleting packages don't work :/
+	#if [ -e "$delete" ]; then
+	#	sudo -u $USER_NAME pacman --noconfirm -Rns $delete
+	#fi
 	
 	# Configure bluetooth
 	#sudo -u $USER_NAME sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
