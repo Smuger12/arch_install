@@ -862,15 +862,15 @@ configure() {
 
 	echo 'Setting temp sudoers config'
 	set_temp_sudoers
-	
-	echo "Setting mirrorlist"
-	set_mirrorlist
 
 	echo "Setting pacman.conf"
 	set_pacman
 
 	echo "Setting makepkg.conf"
 	set_makepkg
+	
+	echo "Setting mirrorlist"
+	set_mirrorlist
 
 	echo 'Installing AUR helper'
 	install_aur_helper
