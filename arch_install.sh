@@ -241,7 +241,7 @@ EOF
 	#sudo -u $USER_NAME sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
 
 	echo "Enabling systemd services"
-	sudo -u $USER_NAME systemctl enable systemd-localed $services
+	systemctl enable systemd-localed $services
 
 	echo "Setting default shell to fish"
 	chsh -s /usr/bin/fish $USER_NAME
