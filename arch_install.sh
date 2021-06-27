@@ -520,6 +520,7 @@ EOF
 
 set_mirrorlist() {
 	pacman --noconfirm -Sy reflector
+	echo "Setting mirrorlist..."
 	reflector --latest 20 --age 24 --sort rate --protocol https --country $REFLECTOR_COUNTRY --save /etc/pacman.d/mirrorlist
 }
 
@@ -864,6 +865,9 @@ configure() {
 
 	echo 'Setting temp sudoers config'
 	set_temp_sudoers
+	
+	echo "Setting mirrorlist"
+	set_mirrorlist
 
 	echo "Setting pacman.conf"
 	set_pacman
