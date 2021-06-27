@@ -257,9 +257,11 @@ EOF
 	
 	cat >/etc/environment <<EOF
 MOZ_ENABLE_WAYLAND=1
-#QT_QPA_PLATFORMTHEME=qt5ct
 QT_QPA_PLATFORM=wayland
 EOF
+	if [ "$DE" = "gnome" ]; then
+		echo "QT_QPA_PLATFORMTHEME=qt5ct" >> /etc/environment
+	fi
 }
 
 #=======
@@ -620,6 +622,7 @@ Defaults pwfeedback
 Defaults passwd_timeout=0
 Defaults lecture="never"
 #Defaults editor=/usr/bin/micro
+Defaults insults
 
 root   ALL=(ALL) ALL
 %wheel ALL=(ALL) ALL
