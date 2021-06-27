@@ -233,10 +233,7 @@ EOF
 	# Install
 	sudo -u $USER_NAME $AUR_HELPER --noconfirm -S $packages
 	# Delete
-	if [ -e "$delete" ]; then
-		echo "Removing unnecessary packages"
-		pacman --noconfirm -Rns $delete
-	fi
+	pacman --noconfirm -Rns $delete
 	
 	# Configure bluetooth
 	#sudo -u $USER_NAME sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
