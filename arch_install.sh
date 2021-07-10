@@ -144,7 +144,7 @@ install_and_config_packages() {
 	packages="$packages pamac-aur"
 	
 	# Browser
-	packages="$packages firefox"
+	packages="$packages google-chrome"
 
 	# Terminal programs
 	packages="$packages micro xclip wl-clipboard neofetch cmatrix bpytop"
@@ -212,12 +212,17 @@ install_and_config_packages() {
 	chsh -s /usr/bin/fish $USER_NAME
 	
 	if [ "$DE" = "gnome" ]; then
-		echo "Setting environment variables"
+		echo "Setting system for gnome on wayland"
 		cat >/etc/environment <<EOF
 MOZ_ENABLE_WAYLAND=1
 QT_QPA_PLATFORM=wayland
 QT_QPA_PLATFORMTHEME=gnome
 EOF
+		cat >/home/$USER_NAME/.config/chrome-flags.conf <<EOF
+--enable-features=UseOzonePlatform 
+--ozone-platform=wayland
+EOF
+		sudo -u $USER_NAME chown $USER_NAME:$USER_NAME /home/$USER_NAME/.config/chrome-flags.conf
 	fi
 	
 	# Install Grub theme (from https://github.com/vinceliuice/grub2-themes)
