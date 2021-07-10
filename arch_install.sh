@@ -139,7 +139,7 @@ install_and_config_packages() {
 	#packages="$packages materia-gtk-theme papirus-icon-theme"
 	
 	# Pamac
-	packages="$packages pamac-aur"
+	packages="$packages pamac-aur archlinux-appstream-data-pamac"
 	
 	# Browser
 	packages="$packages google-chrome"
