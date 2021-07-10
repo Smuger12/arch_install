@@ -48,16 +48,14 @@ USER_PASSWORD=$ROOT_PASSWORD
 DE='gnome'
 
 # Choose keyboard layout (using localectl for this, see below or here: https://man.archlinux.org/man/localectl.1.en).
-VCONSOLE_KEYMAP='us'
-X11_KEYMAP_LAYOUT='us'
-X11_KEYMAP_VARIANT='us'
-X11_KEYMAP_MODEL='pc104'
+KEYMAP_LAYOUT='us'
+KEYMAP_VARIANT='us'
+KEYMAP_MODEL='pc104'
 
 # For my laptop
-#VCONSOLE_KEYMAP='gb-pl'
-#X11_KEYMAP_LAYOUT='gb'
-#X11_KEYMAP_VARIANT='pl'
-#X11_KEYMAP_MODEL='pc105'
+#KEYMAP_LAYOUT='gb'
+#KEYMAP_VARIANT='pl'
+#KEYMAP_MODEL='pc105'
 
 # Choose CPU microcode.
 UCODE='intel-ucode'
@@ -218,6 +216,7 @@ MOZ_ENABLE_WAYLAND=1
 QT_QPA_PLATFORM=wayland
 QT_QPA_PLATFORMTHEME=gnome
 EOF
+		touch /home/$USER_NAME/.config/chrome-flags.conf
 		cat >/home/$USER_NAME/.config/chrome-flags.conf <<EOF
 --enable-features=UseOzonePlatform 
 --ozone-platform=wayland
@@ -553,12 +552,8 @@ EOF
 	fi
 }
 
-set_vconsole_keymap() {
-	localectl --no-ask-password --no-convert set-keymap "$VCONSOLE_KEYMAP"
-}
-
-set_x11_keymap() {
-	localectl --no-ask-password --no-convert set-x11-keymap "$X11_KEYMAP_LAYOUT" "$X11_KEYMAP_MODEL" "$X11_KEYMAP_VARIANT"
+set_keymap() {
+	localectl --no-ask-password set-x11-keymap "$KEYMAP_LAYOUT" "$KEYMAP_MODEL" "$KEYMAP_VARIANT"
 }
 
 set_timezone() {
@@ -848,9 +843,6 @@ configure() {
 	echo "Setting hosts file"
 	set_hosts "$HOSTNAME" "$HOSTS_FILE_TYPE"
 
-	echo "Setting vconsole keymap"
-	set_vconsole_keymap
-
 	echo 'Instaling and configuring bootloader'
 	set_boot
 
@@ -890,8 +882,8 @@ configure() {
 	echo 'Installing and configuring additional packages'
 	install_and_config_packages
 	
-	echo "Setting X11 keymap"
-	set_vconsole_keymap
+	echo "Setting keymap"
+	set_keymap
 	
 	echo 'Clearing AUR helper/pacman cache'
 	clean_packages
