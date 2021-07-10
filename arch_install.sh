@@ -217,7 +217,7 @@ EOF
 	if [ "$BOOTLOADER" = "grub" ]; then
 		echo "Instaling Grub theme"
 		git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
-		sudo -u $USER_NAME chown $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
+		sudo -u $USER_NAME chown -R $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
 		/home/$USER_NAME/grub-themes/install.sh -b -t $GRUB_THEME -s $GRUB_THEME_RES -i $GRUB_THEME_ICONS
 	fi
 }
