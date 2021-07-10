@@ -54,7 +54,7 @@ X11_KEYMAP_VARIANT='us'
 X11_KEYMAP_MODEL='pc104'
 
 # For my laptop
-#VCONSOLE_KEYMAP='uk'
+#VCONSOLE_KEYMAP='gb-pl'
 #X11_KEYMAP_LAYOUT='gb'
 #X11_KEYMAP_VARIANT='pl'
 #X11_KEYMAP_MODEL='pc105'
@@ -95,7 +95,7 @@ AUR_HELPER="paru"
 BOOTLOADER="grub"
 #BOOTLOADER="refind"  # idk if it works :P
 
-# Grub theme (from https://github.com/vinceliuice/grub2-themes).
+# Grub theme (see this: https://github.com/vinceliuice/grub2-themes).
 GRUB_THEME="vimix"
 GRUB_THEME_ICONS="white"
 GRUB_THEME_RES="1080p"
@@ -122,7 +122,7 @@ GRUB_THEME_RES="1080p"
 HOSTS_FILE_TYPE=""
 
 # Customize to install other packages.
-install_packages() {
+install_and_config_packages() {
 
 	# General utilities
 	packages="reflector htop rfkill sudo unrar unzip wget zip xdg-user-dirs exa fish git update-grub"
@@ -135,19 +135,19 @@ install_packages() {
 	services="$services NetworkManager"
 
 	# Fonts
-	packages="$packages ttf-dejavu noto-fonts noto-fonts-emoji ttf-hack ttf-droid"
+	packages="$packages noto-fonts ttf-dejavu ttf-hack ttf-droid ttf-ms-fonts"
 	
 	# Theme
-	packages="$packages materia-gtk-theme papirus-icon-theme"
+	#packages="$packages materia-gtk-theme papirus-icon-theme"
 	
 	# Pamac
-	#packages="$packages pamac-aur"
+	packages="$packages pamac-aur"
 	
 	# Browser
 	packages="$packages firefox"
 
 	# Terminal programs
-	packages="$packages micro xclip wl-clipboard neofetch"
+	packages="$packages micro xclip wl-clipboard neofetch cmatrix bpytop"
 
 	# Multimedia
 	#packages="$packages vlc"
@@ -184,55 +184,15 @@ install_packages() {
 		delete="plasma-vault plasma-thunderbolt oxygen discover"
 	elif [ "$DE" = "gnome" ]; then
 		packages="$packages xorg gnome gnome-tweaks dconf-editor gdm-tools-git archlinux-wallpaper"
-		delete="epiphany gnome-books gnome-boxes gnome-calendar gnome-clocks gnome-software gnome-characters gnome-font-viewer gnome-documents yelp simple-scan gnome-weather gnome-user-docs gnome-contacts gnome-maps"
+		delete="epiphany gnome-books gnome-boxes gnome-calendar gnome-clocks gnome-software gnome-characters gnome-font-viewer gnome-documents yelp simple-scan gnome-weather gnome-user-docs gnome-contacts gnome-maps gnome-logs"
 		services="$services gdm"
 	fi
 	
-	if [ $AUR_HELPER = "paru" ]; then
-		cat >/etc/paru.conf <<EOF
-#
-# $PARU_CONF
-# /etc/paru.conf
-# ~/.config/paru/paru.conf
-#
-# See the paru.conf(5) manpage for options
-
-#
-# GENERAL OPTIONS
-#
-[options]
-PgpFetch
-Devel
-Provides
-DevelSuffixes = -git -cvs -svn -bzr -darcs -always
-#BottomUp
-RemoveMake
-SudoLoop
-UseAsk
-#CombinedUpgrade
-CleanAfter
-UpgradeMenu
-#NewsOnUpgrade
-SkipReview
-
-#LocalRepo
-#Chroot
-#Sign
-#SignDb
-
-#
-# Binary OPTIONS
-#
-#[bin]
-#FileManager = vifm
-#MFlags = --skippgpcheck
-#Sudo = doas
-EOF
-	fi
-	
 	# Install
+	echo "Instaling packages"
 	sudo -u $USER_NAME $AUR_HELPER --noconfirm -S $packages
 	# Delete
+	echo "Removing bloatware :P"
 	pacman --noconfirm -Rns $delete
 	
 	# Configure bluetooth
@@ -244,20 +204,21 @@ EOF
 	echo "Setting default shell to fish"
 	chsh -s /usr/bin/fish $USER_NAME
 	
+	if [ "$DE" = "gnome" ]; then
+		echo "Setting environment variables"
+		cat >/etc/environment <<EOF
+MOZ_ENABLE_WAYLAND=1
+QT_QPA_PLATFORM=wayland
+QT_QPA_PLATFORMTHEME=gnome
+EOF
+	fi
+	
 	# Install Grub theme (from https://github.com/vinceliuice/grub2-themes)
 	if [ "$BOOTLOADER" = "grub" ]; then
 		echo "Instaling Grub theme"
 		git clone https://github.com/vinceliuice/grub2-themes.git /home/$USER_NAME/grub-themes
 		sudo -u $USER_NAME chown $USER_NAME:$USER_NAME /home/$USER_NAME/grub-themes
 		/home/$USER_NAME/grub-themes/install.sh -b -t $GRUB_THEME -s $GRUB_THEME_RES -i $GRUB_THEME_ICONS
-	fi
-	
-	cat >/etc/environment <<EOF
-MOZ_ENABLE_WAYLAND=1
-QT_QPA_PLATFORM=wayland
-EOF
-	if [ "$DE" = "gnome" ]; then
-		echo "QT_QPA_PLATFORMTHEME=gnome" >> /etc/environment
 	fi
 }
 
@@ -581,11 +542,11 @@ EOF
 }
 
 set_vconsole_keymap() {
-	localectl --no-ask-password --no-convert set-keymap $VCONSOLE_KEYMAP
+	localectl --no-ask-password --no-convert set-keymap "$VCONSOLE_KEYMAP"
 }
 
 set_x11_keymap() {
-	localectl --no-ask-password --no-convert set-x11-keymap $X11_KEYMAP_LAYOUT $X11_KEYMAP_MODEL $X11_KEYMAP_VARIANT
+	localectl --no-ask-password --no-convert set-x11-keymap "$X11_KEYMAP_LAYOUT" "$X11_KEYMAP_MODEL" "$X11_KEYMAP_VARIANT"
 }
 
 set_timezone() {
@@ -693,6 +654,45 @@ install_aur_helper() {
 		sudo -u $USER_NAME makepkg -si --noconfirm
 		cd /
 		rm -rf /paru
+		cat >/etc/paru.conf <<EOF
+#
+# $PARU_CONF
+# /etc/paru.conf
+# ~/.config/paru/paru.conf
+#
+# See the paru.conf(5) manpage for options
+
+#
+# GENERAL OPTIONS
+#
+[options]
+PgpFetch
+Devel
+Provides
+DevelSuffixes = -git -cvs -svn -bzr -darcs -always
+#BottomUp
+RemoveMake
+SudoLoop
+UseAsk
+#CombinedUpgrade
+CleanAfter
+UpgradeMenu
+#NewsOnUpgrade
+SkipReview
+
+#LocalRepo
+#Chroot
+#Sign
+#SignDb
+
+#
+# Binary OPTIONS
+#
+#[bin]
+#FileManager = vifm
+#MFlags = --skippgpcheck
+#Sudo = doas
+EOF
 	fi
 }
 
@@ -876,7 +876,7 @@ configure() {
 	install_aur_helper
 
 	echo 'Installing and configuring additional packages'
-	install_packages
+	install_and_config_packages
 	
 	echo "Setting X11 keymap"
 	set_vconsole_keymap
