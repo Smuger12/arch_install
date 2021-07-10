@@ -48,14 +48,7 @@ USER_PASSWORD=$ROOT_PASSWORD
 DE='gnome'
 
 # Choose keyboard layout (using localectl for this, see below or here: https://man.archlinux.org/man/localectl.1.en).
-KEYMAP_LAYOUT='us'
-KEYMAP_VARIANT='us'
-KEYMAP_MODEL='pc104'
-
-# For my laptop
-#KEYMAP_LAYOUT='gb'
-#KEYMAP_VARIANT='pl'
-#KEYMAP_MODEL='pc105'
+KEYMAP='uk'
 
 # Choose CPU microcode.
 UCODE='intel-ucode'
@@ -553,7 +546,7 @@ EOF
 }
 
 set_keymap() {
-	localectl --no-ask-password set-x11-keymap "$KEYMAP_LAYOUT" "$KEYMAP_MODEL" "$KEYMAP_VARIANT"
+	localectl --no-ask-password set-keymap "$KEYMAP"
 }
 
 set_timezone() {
