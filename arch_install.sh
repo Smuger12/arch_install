@@ -126,7 +126,7 @@ install_and_config_packages() {
 	services="$services NetworkManager"
 
 	# Fonts
-	packages="$packages noto-fonts ttf-dejavu ttf-hack ttf-droid ttf-ms-fonts"
+	packages="$packages noto-fonts noto-fonts-emoji ttf-dejavu ttf-hack ttf-droid ttf-ms-fonts"
 	
 	# Theme
 	#packages="$packages materia-gtk-theme papirus-icon-theme"
@@ -209,8 +209,8 @@ MOZ_ENABLE_WAYLAND=1
 QT_QPA_PLATFORM=wayland
 QT_QPA_PLATFORMTHEME=gnome
 EOF
-		touch /home/$USER_NAME/.config/chrome-flags.conf
-		cat >/home/$USER_NAME/.config/chrome-flags.conf <<EOF
+		sudo -u $USER_NAME touch /home/$USER_NAME/.config/chrome-flags.conf
+		sudo -u $USER_NAME cat >/home/$USER_NAME/.config/chrome-flags.conf <<EOF
 --enable-features=UseOzonePlatform 
 --ozone-platform=wayland
 EOF
