@@ -68,7 +68,7 @@ KERNEL='linux-zen linux-zen-headers linux-lts linux-lts-headers'
 
 # Choose your video driver.
 # For Intel
-#VIDEO_DRIVER="i915"
+VIDEO_DRIVER="i915"
 
 # For (f*cking) Nvidia 
 #VIDEO_DRIVER="nouveau"
@@ -79,7 +79,7 @@ KERNEL='linux-zen linux-zen-headers linux-lts linux-lts-headers'
 #VIDEO_DRIVER="radeon"
 
 # For generic stuff
-VIDEO_DRIVER="vesa"
+#VIDEO_DRIVER="vesa"
 
 # virtualbox guest utils
 #VIDEO_DRIVER="vbox"
@@ -165,7 +165,7 @@ install_and_config_packages() {
 
 	# Video drivers
 	if [ "$VIDEO_DRIVER" = "i915" ]; then
-		packages="$packages xf86-video-intel libva-intel-driver"
+		packages="$packages mesa intel-media-driver libva-intel-driver intel-gpu-tools"
 	elif [ "$VIDEO_DRIVER" = "nouveau" ]; then
 		packages="$packages xf86-video-nouveau"
 	elif [ "$VIDEO_DRIVER" = "nvidia" ]; then
@@ -183,7 +183,7 @@ install_and_config_packages() {
 		services="$services sddm"
 		delete="plasma-vault plasma-thunderbolt oxygen discover"
 	elif [ "$DE" = "gnome" ]; then
-		packages="$packages xorg gnome gnome-tweaks dconf-editor gdm-tools-git archlinux-wallpaper"
+		packages="$packages xorg gnome gnome-tweaks dconf-editor gdm-tools-git archlinux-wallpaper qt5-wayland qt6-wayland"
 		delete="epiphany gnome-books gnome-boxes gnome-calendar gnome-clocks gnome-software gnome-characters gnome-font-viewer gnome-documents yelp simple-scan gnome-weather gnome-user-docs gnome-contacts gnome-maps gnome-logs"
 		services="$services gdm"
 	fi
@@ -194,6 +194,13 @@ install_and_config_packages() {
 	# Delete
 	echo "Removing bloatware :P"
 	pacman --noconfirm -Rns $delete
+	
+	if [ "$VIDEO_DRIVER" = "i915" ]; then
+		echo "Configuring intel stuff"
+		sed -i "s/MODULES=()/MODULES=(intel_agp i915)/g" /etc/mkinitcpio.conf
+		echo "options i915 enable_guc=2 enable_fbc=1" >> /etc/modprobe.d/i915.conf
+		mkinitcpio -P
+	fi
 	
 	# Configure bluetooth
 	#sudo -u $USER_NAME sed -i 's/#AutoEnable=false/AutoEnable=false/g' /etc/bluetooth/main.conf
